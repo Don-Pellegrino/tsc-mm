@@ -1,6 +1,7 @@
 open! Core
 
 type t =
+  | Initiate
   | Seeker
   | Alchemist
   | Arcanist
@@ -11,6 +12,7 @@ type t =
 [@@deriving sexp, hash]
 
 let strength = function
+| Initiate -> 40
 | Seeker -> 50
 | Alchemist -> 58
 | Arcanist -> 67
@@ -20,6 +22,7 @@ let strength = function
 | Oracle -> 117
 
 let of_csv = function
+| "Initiate (beige)" -> Initiate
 | "Seeker (dark red)" -> Seeker
 | "Alchemist (blue)" -> Alchemist
 | "Arcanist (green)" -> Arcanist

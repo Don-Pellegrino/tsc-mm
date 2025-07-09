@@ -1,29 +1,25 @@
 open! Core
 
 let all_players =
-  Import.of_filename "tsc2.csv"
+  Import.of_filename "tsc.csv"
   |> Array.fold ~init:String.Map.empty ~f:(fun acc player ->
        Map.add_exn acc ~key:player.name ~data:player )
 
 let players =
   [
-    "nip nop";
-    (* "goop"; *)
-    "Santiago";
-    "_VITALITY_/Exodus";
     "Don Pellegrino";
-    (* "Haversine"; *)
-    "Wool";
     "Drubinda";
+    "Exodus(steam) _Vitality_ (discord)";
     "yeetorbyeetn";
-    (* "Chard Czar"; *)
-    "Agerikk";
-    "sulster";
-    "H.P. Schlubcraft";
-    (* "pony"; *)
-    "Jefe Yankee";
-    (* "KrazeyOne"; *)
-    "Lettuce goblin";
+    "nip nop";
+    (* "Agerikk"; *)
+    "izzy";
+    "Discord - Shwabba Frog    Steam - Dave";
+    "Chard Czar";
+    "ijustagurl.ttv";
+    "Santiago / Santiago:)";
+    "Peak";
+    "Wyllace";
   ]
   |> List.map ~f:(Map.find_exn all_players)
 
@@ -64,5 +60,5 @@ let () =
 
   let split, imbalance = List.nth_exn splits offset in
 
-  print_endline (sprintf !"%{sexp: Split.t}" split);
+  print_endline (sprintf !"Generated %d splits\n%{sexp: Split.t}" (Hashtbl.length tbl) split);
   print_endline (sprintf "Winning split (imbalance of %d):\n%s" imbalance (Split.to_string split))

@@ -10,7 +10,7 @@ type t = private {
 }
 [@@deriving sexp, compare, hash]
 
-val create : string -> Rank.t -> Modifier.t list -> Hero.t list -> Hero.t list -> t
+val create : name:string -> Rank.t -> Modifier.t list -> Hero.t list -> Hero.t list -> t
 
 val of_csv :
   name:string ->

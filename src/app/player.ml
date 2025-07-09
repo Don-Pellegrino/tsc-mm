@@ -16,7 +16,7 @@ end
 
 include T
 
-let create name rank modifiers main_hero_pool secondary_hero_pool =
+let create ~name rank modifiers main_hero_pool secondary_hero_pool =
   let modifiers = Modifier.Set.of_list modifiers in
   let main_hero_pool = Hero.Set.of_list main_hero_pool in
   let secondary_hero_pool = Set.diff (Hero.Set.of_list secondary_hero_pool) main_hero_pool in
@@ -56,7 +56,7 @@ let of_csv ~name ~rank ~modifiers ~main_hero_pool ~secondary_hero_pool =
   let modifiers = parse_list modifiers Modifier.of_csv in
   let main_hero_pool = parse_list main_hero_pool Hero.of_csv in
   let secondary_hero_pool = parse_list secondary_hero_pool Hero.of_csv in
-  create name rank modifiers main_hero_pool secondary_hero_pool
+  create ~name rank modifiers main_hero_pool secondary_hero_pool
 
 let to_string p = sprintf !"%s (%{sexp: Rank.t}, %d)" p.name p.rank p.strength
 

@@ -1,7 +1,7 @@
 opam-version: "2.0"
 maintainer: ""
 authors: []
-synopsis: "High-level preprocessing wrapper around the yaml library"
+synopsis: "TSC's matchmaking algorithm"
 description: """
 """
 license: "MIT"
