@@ -3,6 +3,7 @@
   (name app)
   (libraries
     core
+    csv
   )
   (preprocess (pps
     ppx_jane

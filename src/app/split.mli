@@ -11,3 +11,5 @@ val teams : t -> Team.t * Team.t
 val to_string : t -> string
 
 val imbalance : t -> int
+
+val strength_total : t -> int

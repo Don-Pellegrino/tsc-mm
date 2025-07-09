@@ -1,53 +1,26 @@
 open! Core
 
+let all_players =
+  Import.of_filename "tsc2.csv"
+  |> Array.fold ~init:String.Map.empty ~f:(fun acc player ->
+       Map.add_exn acc ~key:player.name ~data:player )
+
 let players =
-  Player.
-    [
-      create "Peak" Ritualist Archon 2
-        [ Bebop; Haze; Holliday; Infernus; Ivy; Lash; Mirage; Sinclair; Vindicta; Vyper; Warden; Wraith ];
-      create "Atlas" Archon Oracle 2 [ Infernus; Ivy; Paradox; Seven; Wraith ];
-      create "Chard Czar" Ritualist Archon 3 [ Grey_Talon; Haze; Paradox; Pocket; Wraith ];
-      create "Don Pellegrino" Emissary Emissary 0 [ Infernus; Ivy; Lady_Geist; Mirage; Wraith; Yamato ];
-      create "H.P. Schlubcraft" Emissary Emissary 0 [ Abrams; McGinnis; Wraith ];
-      create "izzy" Archon Archon 0
-        [ Abrams; Calico; Holliday; Lash; Paradox; Pocket; Seven; Shiv; Sinclair; Warden; Wraith; Yamato ];
-      create "KrazeyMan" Seeker Alchemist 4 [ Abrams; McGinnis ];
-      create "santiago:)" Emissary Emissary 0 [ Yamato; Haze; Infernus; Bebop; Seven; Warden; Holliday ];
-      create "sulster" Ritualist Emissary 2 [ Lady_Geist; Seven; Vindicta ];
-      create "tsukieru" Archon Oracle 2 [ Calico; Dynamo; McGinnis; Vyper; Warden ];
-      create "yeetorbyeetn" Arcanist Arcanist 5
-        [ Haze; Lady_Geist; Lash; Mirage; Mo_Krill; Paradox; Seven; Wraith ];
-      (* create "Lettuce goblin" Arcanist Emissary 1 [ Grey_Talon; Seven; Vindicta; Wraith ]; *)
-      (* create "_VITALITY_" Ritualist Ritualist 0
-         [
-           Abrams;
-           Bebop;
-           Dynamo;
-           Grey_Talon;
-           Haze;
-           Holliday;
-           Infernus;
-           Ivy;
-           Kelvin;
-           Lady_Geist;
-           Lash;
-           Mirage;
-           Mo_Krill;
-           Paradox;
-           Seven;
-           Shiv;
-           Viscous;
-           Vyper;
-           Warden;
-           Wraith;
-         ]; *)
-      create "~ Swinton" Alchemist Arcanist 3
-        [ Abrams; Calico; Grey_Talon; Kelvin; McGinnis; Mo_Krill; Viscous ];
-      (* create "Deo" Archon Oracle 1
-         [ Abrams; Haze; Infernus; Lash; Paradox; Shiv; Viscous; Warden; Wraith; Yamato ]; *)
-      (* create "ZachShark1" Archon Oracle 1 [ Abrams; Ivy; Lash; Mo_Krill; Paradox; Shiv ]; *)
-      (* create "Agerikk" Emissary Archon 8 [ Abrams; Calico; Dynamo; Seven; Vyper ]; *)
-    ]
+  [
+    "nip nop";
+    "goop";
+    "Santiago";
+    "_VITALITY_/Exodus";
+    "Don Pellegrino";
+    "Haversine";
+    "Drubinda";
+    "yeetorbyeetn";
+    "Chard Czar";
+    "Agerikk";
+    "sulster";
+    "H.P. Schlubcraft";
+  ]
+  |> List.map ~f:(fun name -> Map.find_exn all_players name)
 
 let () =
   let len = List.length players in
@@ -65,12 +38,26 @@ let rec generate t1 n1 t2 n2 tbl = function
   generate t1 n1 (player :: t2) (n2 + 1) tbl rest
 
 let () =
+  let offset =
+    match Sys.get_argv () with
+    | [| _; s |] -> Int.of_string s
+    | [||]
+     |[| _ |] ->
+      0
+    | arr -> failwithf "Invalid arguments, expected 1, found: %d" (Array.length arr - 1) ()
+  in
   let tbl = Split.Table.create () in
   generate [] 0 [] 0 tbl players;
-  let split, imbalance =
-    Hashtbl.fold tbl ~init:(Hashtbl.choose_exn tbl) ~f:(fun ~key:split1 ~data:imb1 (split2, imb2) ->
-      if imb1 < imb2 then split1, imb1 else split2, imb2 )
+
+  let splits =
+    Hashtbl.to_alist tbl
+    |> List.stable_sort ~compare:(fun (split1, imb1) (split2, imb2) ->
+         match [%compare: int] imb1 imb2 with
+         | 0 -> [%compare: int] (Split.strength_total split2) (Split.strength_total split1)
+         | x -> x )
   in
+
+  let split, imbalance = List.nth_exn splits offset in
 
   print_endline (sprintf !"%{sexp: Split.t}" split);
   print_endline (sprintf "Winning split (imbalance of %d):\n%s" imbalance (Split.to_string split))

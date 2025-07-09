@@ -33,6 +33,35 @@ end
 
 include T
 
+let of_csv = function
+| "Abrams" -> Abrams
+| "Bebop" -> Bebop
+| "Calico" -> Calico
+| "Dynamo" -> Dynamo
+| "Grey Talon" -> Grey_Talon
+| "Haze" -> Haze
+| "Holliday" -> Holliday
+| "Infernus" -> Infernus
+| "Ivy" -> Ivy
+| "Kelvin" -> Kelvin
+| "Lady Geist" -> Lady_Geist
+| "Lash" -> Lash
+| "McGinnis" -> McGinnis
+| "Mirage" -> Mirage
+| "Mo & Krill" -> Mo_Krill
+| "Paradox" -> Paradox
+| "Pocket" -> Pocket
+| "Seven" -> Seven
+| "Shiv" -> Shiv
+| "Sinclair" -> Sinclair
+| "Vindicta" -> Vindicta
+| "Viscous" -> Viscous
+| "Vyper" -> Vyper
+| "Warden" -> Warden
+| "Wraith" -> Wraith
+| "Yamato" -> Yamato
+| s -> failwithf "Invalid hero: %S" s ()
+
 let to_string = function
 | Abrams -> "Abrams"
 | Bebop -> "Bebop"
