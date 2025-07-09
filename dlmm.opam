@@ -1,0 +1,30 @@
+opam-version: "2.0"
+maintainer: ""
+authors: []
+synopsis: "High-level preprocessing wrapper around the yaml library"
+description: """
+"""
+license: "MIT"
+tags: []
+homepage: ""
+dev-repo: ""
+doc: ""
+bug-reports: ""
+depends: [
+  "ocaml" { >= "5.0.0" }
+  "dune" { >= "1.9.0" }
+
+  # DEPENDENCIES
+  "yojson"
+  "ppx_deriving_yojson"
+
+  "core" { >= "v0.16" }
+  "ppx_expect"
+  "ppx_sexp_conv"
+  "ppx_deriving_yojson"
+  "ppx_custom_printf"
+
+  "ocamlformat" { = "0.25.1" } # Development
+  "ocaml-lsp-server" # Development
+]
+build: ["dune" "build" "-p" name "-j" jobs]
