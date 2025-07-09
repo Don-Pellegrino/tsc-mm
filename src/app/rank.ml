@@ -26,5 +26,5 @@ let of_csv = function
 | "Ritualist (orange)" -> Ritualist
 | "Emissary (light red)" -> Emissary
 | "Archon (purple)" -> Archon
-| "Oracle (goat)" -> Oracle
+| "Oracle (goat) and up" -> Oracle
 | s -> failwithf "Invalid rank: %S" s ()

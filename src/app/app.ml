@@ -8,19 +8,24 @@ let all_players =
 let players =
   [
     "nip nop";
-    "goop";
+    (* "goop"; *)
     "Santiago";
     "_VITALITY_/Exodus";
     "Don Pellegrino";
-    "Haversine";
+    (* "Haversine"; *)
+    "Wool";
     "Drubinda";
     "yeetorbyeetn";
-    "Chard Czar";
+    (* "Chard Czar"; *)
     "Agerikk";
     "sulster";
     "H.P. Schlubcraft";
+    (* "pony"; *)
+    "Jefe Yankee";
+    (* "KrazeyOne"; *)
+    "Lettuce goblin";
   ]
-  |> List.map ~f:(fun name -> Map.find_exn all_players name)
+  |> List.map ~f:(Map.find_exn all_players)
 
 let () =
   let len = List.length players in

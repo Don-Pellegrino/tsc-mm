@@ -36,24 +36,21 @@ let to_string ((t1, t2) : t) =
     | true, false -> false
     | false, true -> true
   in
+  let amber, sapphire = if t1_has_first_pick then t1, t2 else t2, t1 in
   sprintf
-    !"Team 1%s: %s\n\
-      Team 2%s: %s\n\n\
-      Team 1 (%d)%s: %s\n\
+    !"Amber Hand [FIRST PICK]: %s\n\
+      Sapphire Flame: %s\n\n\
+      Amber Hand (%d): %s\n\
       %{display_heroes}\n\n\
-      Team 2 (%d)%s: %s\n\
+      Sapphire Flame (%d): %s\n\
       %{display_heroes}"
-    (if t1_has_first_pick then " [FIRST PICK]" else "")
-    (Team.to_string t1 ~show_strength:false)
-    (if t1_has_first_pick then "" else " [FIRST PICK]")
-    (Team.to_string t2 ~show_strength:false)
-    (Team.strength t1)
-    (if t1_has_first_pick then " [FIRST PICK]" else "")
-    (Team.to_string t1 ~show_strength:true)
-    (Team.hero_players t1) (Team.strength t2)
-    (if t1_has_first_pick then "" else " [FIRST PICK]")
-    (Team.to_string t2 ~show_strength:true)
-    (Team.hero_players t2)
+    (Team.to_string amber ~show_strength:false)
+    (Team.to_string sapphire ~show_strength:false)
+    (Team.strength amber)
+    (Team.to_string amber ~show_strength:true)
+    (Team.hero_players amber) (Team.strength sapphire)
+    (Team.to_string sapphire ~show_strength:true)
+    (Team.hero_players sapphire)
 
 let imbalance (t1, t2) = Team.strength t1 - Team.strength t2 |> Int.abs
 
