@@ -20,8 +20,9 @@ let create players =
   let total_hero_pool =
     List.fold players ~init:Hero.Set.empty ~f:(fun acc p -> Set.union acc p.hero_pool)
   in
+  let sum_hero_pool = List.fold players ~init:0 ~f:(fun acc p -> acc + Set.length p.hero_pool) in
   let total_hero_pool_size = Set.length total_hero_pool in
-  let strength = sum_strength + max_strength + (total_hero_pool_size * 2) in
+  let strength = sum_strength + max_strength + (total_hero_pool_size * 2) + (sum_hero_pool * 3) in
   let players = List.sort ~compare:(fun p1 p2 -> [%compare: int] p2.strength p1.strength) players in
   { players; total_hero_pool; total_hero_pool_size; strength }
 

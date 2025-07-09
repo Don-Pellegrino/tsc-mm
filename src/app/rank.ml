@@ -11,10 +11,10 @@ type t =
 [@@deriving sexp, hash]
 
 let strength = function
-| Seeker -> 0
-| Alchemist -> 10
-| Arcanist -> 20
-| Ritualist -> 30
-| Emissary -> 40
-| Archon -> 50
-| Oracle -> 60
+| Seeker -> 50
+| Alchemist -> 60
+| Arcanist -> 70
+| Ritualist -> 80
+| Emissary -> 90
+| Archon -> 100
+| Oracle -> 110

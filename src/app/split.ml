@@ -8,8 +8,8 @@ include T
 
 let create t1 t2 =
   match [%compare: Team.t] t1 t2 with
-  | -1 -> t1, t2
-  | _ -> t2, t1
+  | 1 -> t2, t1
+  | _ -> t1, t2
 
 let teams t = t
 

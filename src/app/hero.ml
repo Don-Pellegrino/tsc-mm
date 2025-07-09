@@ -66,6 +66,4 @@ module Set = struct
   include Provide_hash (T)
 end
 
-module Map = struct
-  include Map.Make (T)
-end
+module Map = Map.Make (T)
