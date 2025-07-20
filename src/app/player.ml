@@ -22,8 +22,8 @@ let create ~name rank modifiers main_hero_pool secondary_hero_pool =
   let secondary_hero_pool = Set.diff (Hero.Set.of_list secondary_hero_pool) main_hero_pool in
   let strength =
     Rank.strength rank
-    + (Set.length main_hero_pool / 2)
-    + (Set.length secondary_hero_pool / 4)
+    + Set.length main_hero_pool
+    + Set.length secondary_hero_pool
     + Modifier.strength_total modifiers
   in
   { name; rank; modifiers; main_hero_pool; secondary_hero_pool; strength }
