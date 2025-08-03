@@ -9,6 +9,7 @@ type t =
   | Emissary
   | Archon
   | Oracle
+  | Phantom
 [@@deriving sexp, hash]
 
 let strength = function
@@ -20,6 +21,7 @@ let strength = function
 | Emissary -> 89
 | Archon -> 102
 | Oracle -> 117
+| Phantom -> 134
 
 let of_csv = function
 | "Initiate (beige)" -> Initiate
@@ -29,5 +31,6 @@ let of_csv = function
 | "Ritualist (orange)" -> Ritualist
 | "Emissary (light red)" -> Emissary
 | "Archon (purple)" -> Archon
-| "Oracle (goat) and up" -> Oracle
+| "Oracle (goat)" -> Oracle
+| "Phantom and up" -> Phantom
 | s -> failwithf "Invalid rank: %S" s ()

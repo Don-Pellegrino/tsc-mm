@@ -4,7 +4,9 @@ module T = struct
   type t = {
     name: string;
     rank: Rank.t;
-    modifiers: Modifier.Set.t;
+    practicing: Modifier.Practicing.t;
+    queueing: Modifier.Queueing.t;
+    pressure: Modifier.Pressure.t;
     main_hero_pool: Hero.Set.t;
     secondary_hero_pool: Hero.Set.t;
     strength: int;
@@ -16,17 +18,18 @@ end
 
 include T
 
-let create ~name rank modifiers main_hero_pool secondary_hero_pool =
-  let modifiers = Modifier.Set.of_list modifiers in
+let create ~name rank practicing queueing pressure main_hero_pool secondary_hero_pool =
   let main_hero_pool = Hero.Set.of_list main_hero_pool in
   let secondary_hero_pool = Set.diff (Hero.Set.of_list secondary_hero_pool) main_hero_pool in
   let strength =
     Rank.strength rank
     + Set.length main_hero_pool
     + Set.length secondary_hero_pool
-    + Modifier.strength_total modifiers
+    + Modifier.Practicing.strength practicing
+    + Modifier.Queueing.strength queueing
+    + Modifier.Pressure.strength pressure
   in
-  { name; rank; modifiers; main_hero_pool; secondary_hero_pool; strength }
+  { name; rank; practicing; queueing; pressure; main_hero_pool; secondary_hero_pool; strength }
 
 let parse_list raw parser =
   let ll = String.split ~on:',' raw in
@@ -51,12 +54,14 @@ let parse_list raw parser =
   in
   if Buffer.length buf > 0 then (Buffer.contents buf |> parser) :: parsed else parsed
 
-let of_csv ~name ~rank ~modifiers ~main_hero_pool ~secondary_hero_pool =
+let of_csv ~name ~rank ~practicing ~queueing ~pressure ~main_hero_pool ~secondary_hero_pool =
   let rank = Rank.of_csv rank in
-  let modifiers = parse_list modifiers Modifier.of_csv in
+  let practicing = Modifier.Practicing.of_csv practicing in
+  let queueing = Modifier.Queueing.of_csv queueing in
+  let pressure = Modifier.Pressure.of_csv pressure in
   let main_hero_pool = parse_list main_hero_pool Hero.of_csv in
   let secondary_hero_pool = parse_list secondary_hero_pool Hero.of_csv in
-  create ~name rank modifiers main_hero_pool secondary_hero_pool
+  create ~name rank practicing queueing pressure main_hero_pool secondary_hero_pool
 
 let to_string p = sprintf !"%s (%{sexp: Rank.t}, %d)" p.name p.rank p.strength
 

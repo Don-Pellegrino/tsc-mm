@@ -8,17 +8,21 @@ let all_players =
 let players =
   [
     "Don Pellegrino";
-    "_VITALITY_";
-    "Drubinda";
-    "~Swinton";
-    "nip nop";
-    "Chard Czar";
-    "yeetorbyeetn";
-    "Santiago";
+    "Vitality";
     "Shwabba Frog";
-    "Agerikk";
+    (* "Chard Czar"; *)
+    (* "yeetorbyeetn"; *)
+    "Santiago";
+    (* "~ Swinton"; *)
+    "nip nop";
+    (* "izzy"; *)
+    "goky34";
+    "Peak";
+    "Wyllace";
+    "tsu (Dill Dough)";
+    "skullx";
+    "Drubinda";
     "Adam Davis";
-    "wyllace";
   ]
   |> List.map ~f:(Map.find_exn all_players)
 

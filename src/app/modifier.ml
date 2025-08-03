@@ -1,50 +1,73 @@
 open! Core
 
-module T = struct
+module Practicing = struct
   type t =
-    | Ranking_up
-    | Rank_stable
-    | Ranking_down
-    | Not_playing_as_much
-    | Rank_too_high
-    | Rank_accurate
-    | Rank_too_low
-    | Mainly_parties
-    | Pressure_better
-    | Pressure_worse
-  [@@deriving sexp, compare, hash]
+    | More
+    | Usual
+    | Less
+    | Little
+  [@@deriving sexp, hash]
+
+  let of_csv = function
+  | "More than usual!" -> More
+  | "About the same as usual" -> Usual
+  | "Less than usual" -> Less
+  | "I basically haven't been playing Deadlock in the last few weeks" -> Little
+  | s -> failwithf "Invalid Practicing modifier: %S" s ()
+
+  let strength = function
+  | More -> 7
+  | Usual -> 0
+  | Less -> -7
+  | Little -> -13
 end
 
-include T
+module Queueing = struct
+  type t =
+    | Solo
+    | Small_highest
+    | Small
+    | Large_highest
+    | Large
+    | Other
+  [@@deriving sexp, hash]
 
-let of_csv = function
-| "In the last 2-3 weeks I've been (mostly or slowly) ranking up." -> Ranking_up
-| "My rank in the last 2-3 weeks hasn't really changed." -> Rank_stable
-| "In the last 2-3 weeks I've been (mostly or slowly) ranking down." -> Ranking_down
-| "I haven't played as much recently." -> Not_playing_as_much
-| "I feel like my current rank is too high." -> Rank_too_high
-| "My current rank is probably accurate" -> Rank_accurate
-| "I feel like my current rank is too low." -> Rank_too_low
-| "I usually play in parties of 4, 5, or 6 people." -> Mainly_parties
-| "I tend to perform better under pressure." -> Pressure_better
-| "I tend to perform worse under pressure." -> Pressure_worse
-| s -> failwithf "Invalid modifier: %S" s ()
+  let of_csv = function
+  | "Solo queue 4 lyfe, baby" -> Solo
+  | "Small parties (2-3), I'm usually the highest ranked in the party" -> Small_highest
+  | "Small parties (2-3), I'm rarely the highest ranked in the party" -> Small
+  | "Large parties (4-6), I'm usually one of the highest ranked in the party" -> Large_highest
+  | "Large parties (4-6), I'm almost never one of the highest ranked in the party" -> Large
+  | "I don't know" -> Other
+  | s -> failwithf "Invalid Queueing modifier: %S" s ()
 
-let strength = function
-| Ranking_up -> 5
-| Rank_stable -> 0
-| Ranking_down -> -5
-| Not_playing_as_much -> -10
-| Rank_too_high -> -7
-| Rank_accurate -> 0
-| Rank_too_low -> 7
-| Mainly_parties -> -4
-| Pressure_better -> 4
-| Pressure_worse -> -4
+  let strength = function
+  | Solo -> -4
+  | Small_highest -> 4
+  | Small -> -2
+  | Large_highest -> 8
+  | Large -> -5
+  | Other -> 0
+end
 
-let strength_total set = Set.fold set ~init:0 ~f:(fun acc x -> acc + strength x)
+module Pressure = struct
+  type t =
+    | Better
+    | Worse
+    | Same
+    | Dont_know
+  [@@deriving sexp, hash]
 
-module Set = struct
-  include Set.Make (T)
-  include Provide_hash (T)
+  let of_csv = function
+  | "Better" -> Better
+  | "Worse" -> Worse
+  | "About the same, it doesn't affect me" -> Same
+  | "I don't know" -> Dont_know
+  | s -> failwithf "Invalid Pressure modifier: %S" s ()
+
+  let strength = function
+  | Better -> 3
+  | Worse -> -4
+  | Same -> 0
+  | Dont_know -> 0
 end
