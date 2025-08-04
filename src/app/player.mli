@@ -5,7 +5,7 @@ type t = private {
   rank: Rank.t;
   practicing: Modifier.Practicing.t;
   queueing: Modifier.Queueing.t;
-  pressure: Modifier.Pressure.t;
+  comms: Modifier.Comms.t;
   main_hero_pool: Hero.Set.t;
   secondary_hero_pool: Hero.Set.t;
   strength: int;
@@ -17,7 +17,7 @@ val create :
   Rank.t ->
   Modifier.Practicing.t ->
   Modifier.Queueing.t ->
-  Modifier.Pressure.t ->
+  Modifier.Comms.t ->
   Hero.t list ->
   Hero.t list ->
   t
@@ -27,7 +27,7 @@ val of_csv :
   rank:string ->
   practicing:string ->
   queueing:string ->
-  pressure:string ->
+  comms:string ->
   main_hero_pool:string ->
   secondary_hero_pool:string ->
   t

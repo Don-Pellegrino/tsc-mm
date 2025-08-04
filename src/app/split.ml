@@ -38,8 +38,10 @@ let to_string ((t1, t2) : t) =
   in
   let amber, sapphire = if t1_has_first_pick then t1, t2 else t2, t1 in
   sprintf
-    !"Amber Hand [FIRST PICK]: %s\n\
-      Sapphire Flame: %s\n\n\
+    !":raised_hand: Amber Hand [FIRST PICK]: \n\
+      %s\n\
+      :gem: Sapphire Flame: \n\
+      %s\n\
       Amber Hand (%d): %s\n\
       %{display_heroes}\n\n\
       Sapphire Flame (%d): %s\n\

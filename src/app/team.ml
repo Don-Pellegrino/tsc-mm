@@ -27,7 +27,7 @@ let create players =
   let main_hero_pool_size = Set.length main_hero_pool in
   let total_hero_pool_size = Set.length total_hero_pool in
 
-  let strength = sum_strength + max_strength + (main_hero_pool_size * 3) + total_hero_pool_size in
+  let strength = (max_strength / 2) + sum_strength + main_hero_pool_size + (total_hero_pool_size / 2) in
   let players =
     List.stable_sort players ~compare:(fun p1 p2 -> [%compare: int] p2.strength p1.strength)
   in
@@ -38,7 +38,7 @@ let to_string ~show_strength = function
 | { players; _ } ->
   let players = Array.of_list players in
   Array.permute players;
-  Array.map players ~f:(fun p -> p.name) |> String.concat_array ~sep:", "
+  Array.map players ~f:(fun p -> sprintf "- %s\n" p.name) |> String.concat_array
 
 let strength { strength; _ } = strength
 
