@@ -42,17 +42,60 @@ let to_string ~show_strength = function
 
 let strength { strength; _ } = strength
 
-let hero_players { players; _ } =
-  (* Doing it in 2 passes with secondary heroes first so the main heroes come out ahead *)
-  let init =
-    List.fold players ~init:Hero.Map.empty ~f:(fun init p ->
-      Set.fold p.secondary_hero_pool ~init ~f:(fun acc h -> Map.add_multi acc ~key:h ~data:p) )
-  in
-  let init =
-    List.fold players ~init ~f:(fun init p ->
-      Set.fold p.main_hero_pool ~init ~f:(fun acc h -> Map.add_multi acc ~key:h ~data:p) )
-  in
-  List.fold Hero.all ~init ~f:(fun acc h ->
-    match Map.add acc ~key:h ~data:[] with
-    | `Ok acc -> acc
-    | `Duplicate -> acc )
+let random_player_strength_weighted { players; _ } =
+  let total_strength = List.fold players ~init:0 ~f:(fun acc { strength; _ } -> acc + strength) in
+  let n = Random.int total_strength in
+  List.fold_until players ~init:0
+    ~finish:(fun x -> failwithf "Unexpected termination during random player selection at %d" x ())
+    ~f:(fun acc ({ strength; _ } as p) ->
+      if n < acc + strength then Stop p else Continue (acc + strength))
+
+module Hero_players = struct
+  type t0 = t
+
+  type t = Player.t list Hero.Map.t
+
+  let of_team { players; _ } =
+    (* Doing it in 2 passes with secondary heroes first so the main heroes come out ahead *)
+    let init =
+      List.fold players ~init:Hero.Map.empty ~f:(fun init p ->
+        Set.fold p.secondary_hero_pool ~init ~f:(fun acc h -> Map.add_multi acc ~key:h ~data:p) )
+    in
+    let init =
+      List.fold players ~init ~f:(fun init p ->
+        Set.fold p.main_hero_pool ~init ~f:(fun acc h -> Map.add_multi acc ~key:h ~data:p) )
+    in
+    List.fold Hero.all ~init ~f:(fun acc h ->
+      match Map.add acc ~key:h ~data:[] with
+      | `Ok acc -> acc
+      | `Duplicate -> acc )
+
+  let combine : t list -> t = function
+  | [] -> Hero.Map.empty
+  | [ x ] -> x
+  | init :: ll ->
+    List.fold ll ~init ~f:(fun acc map ->
+      Map.merge acc map ~f:(fun ~key -> function
+        | `Left x
+         |`Right x ->
+          Some x
+        | `Both (x, y) ->
+          List.concat_no_order [ x; y ]
+          |> List.sort ~compare:(fun p1 p2 ->
+               match Set.mem p1.main_hero_pool key, Set.mem p2.main_hero_pool key with
+               | true, true
+                |false, false ->
+                 0
+               | true, false -> -1
+               | false, true -> 1 )
+          |> Option.return ) )
+
+  let to_string (heroes : t) =
+    Map.to_alist heroes
+    |> List.map ~f:(fun (h, players) ->
+         List.map players ~f:(fun (p : Player.t) ->
+           sprintf "\t%s%s" (if Set.mem p.main_hero_pool h then "*" else "") p.name )
+         |> String.concat
+         |> sprintf !"%{Hero}%s" h )
+    |> String.concat ~sep:"\n"
+end

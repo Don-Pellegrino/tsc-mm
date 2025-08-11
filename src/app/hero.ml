@@ -90,9 +90,40 @@ let to_string = function
 | Wraith -> "Wraith"
 | Yamato -> "Yamato"
 
+let is_frontliner = function
+| Abrams -> true
+| Bebop -> true
+| Calico -> true
+| Dynamo -> false
+| Grey_Talon -> false
+| Haze -> false
+| Holliday -> false
+| Infernus -> false
+| Ivy -> false
+| Kelvin -> true
+| Lady_Geist -> true
+| Lash -> false
+| McGinnis -> true
+| Mirage -> false
+| Mo_Krill -> true
+| Paradox -> false
+| Pocket -> false
+| Seven -> false
+| Shiv -> true
+| Sinclair -> false
+| Vindicta -> false
+| Viscous -> false
+| Vyper -> false
+| Warden -> true
+| Wraith -> false
+| Yamato -> true
+
 module Set = struct
   include Set.Make (T)
   include Provide_hash (T)
 end
 
 module Map = Map.Make (T)
+module Table = Hashtbl.Make (T)
+
+let all_set = Set.of_list all

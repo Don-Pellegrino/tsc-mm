@@ -8,6 +8,7 @@ type t = private {
   comms: Modifier.Comms.t;
   main_hero_pool: Hero.Set.t;
   secondary_hero_pool: Hero.Set.t;
+  unselected_hero_pool: Hero.Set.t;
   strength: int;
 }
 [@@deriving sexp, compare, hash]
@@ -35,3 +36,5 @@ val of_csv :
 val to_string : t -> string
 
 val strength : t -> int
+
+module Map : Map.S with type Key.t = t

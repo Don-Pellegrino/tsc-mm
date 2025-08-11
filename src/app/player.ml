@@ -9,6 +9,7 @@ module T = struct
     comms: Modifier.Comms.t;
     main_hero_pool: Hero.Set.t;
     secondary_hero_pool: Hero.Set.t;
+    unselected_hero_pool: Hero.Set.t;
     strength: int;
   }
   [@@deriving sexp, hash]
@@ -21,6 +22,7 @@ include T
 let create ~name rank practicing queueing comms main_hero_pool secondary_hero_pool =
   let main_hero_pool = Hero.Set.of_list main_hero_pool in
   let secondary_hero_pool = Set.diff (Hero.Set.of_list secondary_hero_pool) main_hero_pool in
+  let unselected_hero_pool = Set.diff Hero.all_set (Set.union main_hero_pool secondary_hero_pool) in
   let strength =
     Rank.strength rank
     + (Set.length main_hero_pool / 2)
@@ -29,7 +31,17 @@ let create ~name rank practicing queueing comms main_hero_pool secondary_hero_po
     + Modifier.Queueing.strength queueing
     + Modifier.Comms.strength comms
   in
-  { name; rank; practicing; queueing; comms; main_hero_pool; secondary_hero_pool; strength }
+  {
+    name;
+    rank;
+    practicing;
+    queueing;
+    comms;
+    main_hero_pool;
+    secondary_hero_pool;
+    unselected_hero_pool;
+    strength;
+  }
 
 let parse_list raw parser =
   let ll = String.split ~on:',' raw in
@@ -67,4 +79,4 @@ let to_string p = sprintf !"%s (%{sexp: Rank.t}, %d)" p.name p.rank p.strength
 
 let strength { strength; _ } = strength
 
-module Set = Set.Make (T)
+module Map = Map.Make (T)
