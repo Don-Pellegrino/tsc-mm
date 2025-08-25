@@ -18,6 +18,8 @@ val strength : t -> int
 
 val random_player_strength_weighted : t -> Player.t
 
+val player_position : t -> int -> Player.t
+
 module Hero_players : sig
   type t0 = t
 

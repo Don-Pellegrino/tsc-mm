@@ -14,13 +14,23 @@ val strength_total : t -> int
 
 type player_assignments = Hero.t Player.Map.t [@@deriving sexp, compare]
 
-type random_heroes = {
-  hero_by_player: player_assignments;
-  points: (string * int) list;
-  total_points: int;
-  t1_frontliners: int;
-  t2_frontliners: int;
-}
-[@@deriving sexp]
+module Random_heroes : sig
+  type t0 = t
 
-val random_heroes : t -> random_heroes
+  type t = {
+    hero_by_player: player_assignments;
+    points: (string * int) list;
+    total_points: int;
+    t1_frontliners: int;
+    t2_frontliners: int;
+  }
+  [@@deriving sexp]
+
+  type priorities =
+    | Tertiary
+    | Secondary
+
+  val priorities_to_string : priorities -> string
+
+  val generate : priorities -> t0 -> t
+end

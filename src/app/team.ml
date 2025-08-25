@@ -16,8 +16,9 @@ include T
 
 let create players =
   let max_strength, sum_strength =
-    let strengths = List.map players ~f:Player.strength in
-    List.fold strengths ~init:(0, 0) ~f:(fun (acc_max, acc_sum) x -> max x acc_max, x + acc_sum)
+    List.fold players ~init:(0, 0) ~f:(fun (acc_max, acc_sum) p ->
+      let strength = Player.strength p in
+      max strength acc_max, strength + acc_sum )
   in
   let main_hero_pool, total_hero_pool =
     List.fold players ~init:(Hero.Set.empty, Hero.Set.empty) ~f:(fun (acc_main, acc_total) p ->
@@ -49,6 +50,8 @@ let random_player_strength_weighted { players; _ } =
     ~finish:(fun x -> failwithf "Unexpected termination during random player selection at %d" x ())
     ~f:(fun acc ({ strength; _ } as p) ->
       if n < acc + strength then Stop p else Continue (acc + strength))
+
+let player_position { players; _ } index = List.nth_exn players index
 
 module Hero_players = struct
   type t0 = t
@@ -82,6 +85,7 @@ module Hero_players = struct
         | `Both (x, y) ->
           List.concat_no_order [ x; y ]
           |> List.sort ~compare:(fun p1 p2 ->
+               (* Keep main heroes first *)
                match Set.mem p1.main_hero_pool key, Set.mem p2.main_hero_pool key with
                | true, true
                 |false, false ->

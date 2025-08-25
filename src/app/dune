@@ -3,6 +3,7 @@
   (name app)
   (libraries
     core
+    core_unix.command_unix
     csv
   )
   (preprocess (pps
