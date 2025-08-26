@@ -6,6 +6,8 @@ let of_filename filename =
   |> Array.to_sequence
   |> Fn.flip Sequence.drop 1
   |> Sequence.map ~f:(function
+       | [| _ts; name; rank; queueing; practicing; comms |] ->
+         Player.of_csv ~name ~rank ~practicing ~queueing ~comms ~main_hero_pool:"" ~secondary_hero_pool:""
        | [|
            _ts; name; rank; practicing; queueing; main_hero_pool; secondary_hero_pool; comms; _att; _part;
          |] ->
