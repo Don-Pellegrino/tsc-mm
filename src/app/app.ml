@@ -9,20 +9,21 @@ let all_players =
 
 let players =
   [
+    (* "Drubinda"; *)
     "Don Pellegrino";
-    "tsu";
-    "ijustagurl";
-    "Pony Soprano";
-    "StepFish I’m stuck!";
-    "Flockthebird";
+    "nipnop";
     "yeetorbyeetn";
+    "Shwabba Frog";
+    "Chris!";
+    "BARD";
     "Santiago";
-    "Goky34";
-    "Swinton";
+    (* "Flockthebird"; *)
+    (* "Swinton"; *)
+    "tsu";
     "Jarf";
-    "Adam Davis";
-    (* "Wool"; *)
-    (* "Agerikk"; *)
+    "Narsty";
+    "VentiAyahuascaBigGulp";
+    "DrPocketz/Gwizz";
   ]
   |> List.map ~f:(Map.find_exn all_players)
 
@@ -65,8 +66,17 @@ let () =
     Mode_standard.run ~offset splits
   in
   let reverse =
-    let%map offset = offset in
-    Mode_reverse.run ~offset splits
+    let%map offset = offset
+    and submode =
+      Param.(
+        flag "-p" (optional int) ~aliases:[ "--position" ] ~full_flag_required:()
+          ~doc:
+            "POSITION Have the players of a specific position draft instead of a random weighted system" )
+      >>| function
+      | None -> Mode_reverse.Random
+      | Some index -> Position index
+    in
+    Mode_reverse.run ~offset submode splits
   in
   let random =
     let random (priorities : Split.Random_heroes.priorities) =

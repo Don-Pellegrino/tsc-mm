@@ -27,9 +27,9 @@ let create ~name rank practicing queueing comms main_hero_pool secondary_hero_po
     Rank.strength rank
     + (Set.length main_hero_pool / 2)
     + (Set.length secondary_hero_pool / 3)
-    + Modifier.Practicing.strength practicing
-    + Modifier.Queueing.strength queueing
-    + Modifier.Comms.strength comms
+    + Modifier.Practicing.strength rank practicing
+    + Modifier.Queueing.strength rank queueing
+    + Modifier.Comms.strength rank comms
   in
   {
     name;

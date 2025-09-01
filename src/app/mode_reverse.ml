@@ -1,18 +1,21 @@
 open! Core
 
-let run ~offset splits () =
+type submode =
+  | Random
+  | Position of int
+
+let run ~offset submode splits () =
   let split, imbalance = List.nth_exn splits offset in
   print_endline (sprintf !"%{sexp: Split.t}" split);
 
   let `Amber amber, `Sapphire sapphire = Split.teams split in
 
-  let amber_player = Team.random_player_strength_weighted amber in
-  let sapphire_player = Team.random_player_strength_weighted sapphire in
+  let amber_player, sapphire_player =
+    match submode with
+    | Random -> Team.random_player_strength_weighted amber, Team.random_player_strength_weighted sapphire
+    | Position index -> Team.player_position amber index, Team.player_position sapphire index
+  in
 
-  (* TODO: flag to pick the submode here *)
-  (* let index = 0 in
-     let amber_player = Team.player_position amber index in
-     let sapphire_player = Team.player_position sapphire index in *)
   print_endline
     (sprintf
        !"Imbalance: %d\n\n\

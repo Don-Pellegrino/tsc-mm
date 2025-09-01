@@ -4,7 +4,10 @@ module T = struct
   type t =
     | Abrams
     | Bebop
+    | Billy
     | Calico
+    | Doorman
+    | Drifter
     | Dynamo
     | Grey_Talon
     | Haze
@@ -15,13 +18,16 @@ module T = struct
     | Lady_Geist
     | Lash
     | McGinnis
+    | Mina
     | Mirage
     | Mo_Krill
+    | Paige
     | Paradox
     | Pocket
     | Seven
     | Shiv
     | Sinclair
+    | Victor
     | Vindicta
     | Viscous
     | Vyper
@@ -36,7 +42,10 @@ include T
 let of_csv = function
 | "Abrams" -> Abrams
 | "Bebop" -> Bebop
+| "Billy" -> Billy
 | "Calico" -> Calico
+| "Doorman" -> Doorman
+| "Drifter" -> Drifter
 | "Dynamo" -> Dynamo
 | "Grey Talon" -> Grey_Talon
 | "Haze" -> Haze
@@ -47,13 +56,16 @@ let of_csv = function
 | "Lady Geist" -> Lady_Geist
 | "Lash" -> Lash
 | "McGinnis" -> McGinnis
+| "Mina" -> Mina
 | "Mirage" -> Mirage
 | "Mo & Krill" -> Mo_Krill
+| "Paige" -> Paige
 | "Paradox" -> Paradox
 | "Pocket" -> Pocket
 | "Seven" -> Seven
 | "Shiv" -> Shiv
 | "Sinclair" -> Sinclair
+| "Victor" -> Victor
 | "Vindicta" -> Vindicta
 | "Viscous" -> Viscous
 | "Vyper" -> Vyper
@@ -65,7 +77,10 @@ let of_csv = function
 let to_string = function
 | Abrams -> "Abrams"
 | Bebop -> "Bebop"
+| Billy -> "Billy"
 | Calico -> "Calico"
+| Doorman -> "Doorman"
+| Drifter -> "Drifter"
 | Dynamo -> "Dynamo"
 | Grey_Talon -> "Grey Talon"
 | Haze -> "Haze"
@@ -76,13 +91,16 @@ let to_string = function
 | Lady_Geist -> "Lady Geist"
 | Lash -> "Lash"
 | McGinnis -> "McGinnis"
+| Mina -> "Mina"
 | Mirage -> "Mirage"
 | Mo_Krill -> "Mo & Krill"
+| Paige -> "Paige"
 | Paradox -> "Paradox"
 | Pocket -> "Pocket"
 | Seven -> "Seven"
 | Shiv -> "Shiv"
 | Sinclair -> "Sinclair"
+| Victor -> "Victor"
 | Vindicta -> "Vindicta"
 | Viscous -> "Viscous"
 | Vyper -> "Vyper"
@@ -92,8 +110,11 @@ let to_string = function
 
 let is_frontliner = function
 | Abrams -> true
+| Billy -> true
 | Bebop -> true
 | Calico -> true
+| Doorman -> false
+| Drifter -> true
 | Dynamo -> false
 | Grey_Talon -> false
 | Haze -> false
@@ -104,13 +125,16 @@ let is_frontliner = function
 | Lady_Geist -> true
 | Lash -> false
 | McGinnis -> true
+| Mina -> false
 | Mirage -> false
 | Mo_Krill -> true
+| Paige -> false
 | Paradox -> false
 | Pocket -> false
 | Seven -> false
 | Shiv -> true
 | Sinclair -> false
+| Victor -> true
 | Vindicta -> false
 | Viscous -> false
 | Vyper -> false

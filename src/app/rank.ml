@@ -23,6 +23,9 @@ let strength = function
 | Oracle -> 117
 | Phantom -> 134
 
+let apply_multiplier rank multiplier =
+  Float.(of_int (strength rank) * (multiplier - 1.0)) |> Float.round_nearest_half_to_even |> Float.to_int
+
 let of_csv = function
 | "Initiate (beige)" -> Initiate
 | "Seeker (dark red)" -> Seeker
