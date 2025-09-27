@@ -23,6 +23,12 @@ module Random_heroes : sig
     total_points: int;
     t1_frontliners: int;
     t2_frontliners: int;
+    t1_carries: int;
+    t2_carries: int;
+    t1_picks: int;
+    t2_picks: int;
+    t1_teamfighters: int;
+    t2_teamfighters: int;
   }
   [@@deriving sexp]
 

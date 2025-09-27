@@ -43,6 +43,12 @@ module Random_heroes = struct
     total_points: int;
     t1_frontliners: int;
     t2_frontliners: int;
+    t1_carries: int;
+    t2_carries: int;
+    t1_picks: int;
+    t2_picks: int;
+    t1_teamfighters: int;
+    t2_teamfighters: int;
   }
   [@@deriving sexp]
 
@@ -54,6 +60,15 @@ module Random_heroes = struct
   | Tertiary -> "tertiary"
   | Secondary -> "secondary"
 
+  type comp_stats = {
+    mutable frontliners: int;
+    mutable carries: int;
+    mutable picks: int;
+    mutable teamfighters: int;
+  }
+
+  let empty_stats () = { frontliners = 0; carries = 0; picks = 0; teamfighters = 0 }
+
   let generate priorities ((t1, t2) : t0) =
     let pool_diff pool acc = Set.filter pool ~f:(fun h -> Map.mem acc h |> not) in
     let prioritize (acc, points) (player : Player.t) pools =
@@ -63,7 +78,9 @@ module Random_heroes = struct
         then None
         else (
           let points =
-            if penalty = 0 then points else (sprintf "Pool[%s]" player.name, penalty) :: points
+            if penalty = 0
+            then points
+            else (sprintf "Pool[%s -%d]" player.name penalty, penalty) :: points
           in
           Some (Map.add_exn acc ~key:(Set.choose_exn available) ~data:player, points) ) )
     in
@@ -95,22 +112,56 @@ module Random_heroes = struct
       Map.fold player_by_hero ~init:Player.Map.empty ~f:(fun ~key ~data ->
         Map.add_exn ~key:data ~data:key )
     in
-    let t1_frontliners, t2_frontliners =
-      Tuple2.map (t1.players, t2.players)
-        ~f:(List.count ~f:(fun p -> Map.find_exn hero_by_player p |> Hero.is_frontliner))
+    let load (team : Team.t) =
+      let stats = empty_stats () in
+      List.iter team.players ~f:(fun p ->
+        let hero = Map.find_exn hero_by_player p in
+        if Hero.is_frontliner hero then stats.frontliners <- stats.frontliners + 1;
+        if Hero.is_carry hero then stats.carries <- stats.carries + 1;
+        if Hero.is_pick hero then stats.picks <- stats.picks + 1;
+        if Hero.is_teamfighter hero then stats.teamfighters <- stats.teamfighters + 1 );
+      stats
     in
+    let t1_stats = load t1 in
+    let t2_stats = load t2 in
     let points =
       let add_if cond x ll = if cond then x :: ll else ll in
       points
-      |> add_if (t1_frontliners <> t2_frontliners)
-           ("T1 more frontliners", t1_frontliners - t2_frontliners |> Int.abs)
-      |> add_if (t1_frontliners = 0) ("T1 0 frontliners", 5)
-      |> add_if (t1_frontliners = 1) ("T1 1 frontliner", 3)
-      |> add_if (t2_frontliners = 0) ("T2 0 frontliners", 5)
-      |> add_if (t2_frontliners = 1) ("T2 1 frontliner", 3)
+      |> add_if
+           (t1_stats.frontliners <> t2_stats.frontliners)
+           ("frontliners imbalance", t1_stats.frontliners - t2_stats.frontliners |> Int.abs)
+      |> add_if (t1_stats.frontliners = 0) ("T1 0 frontliners", 5)
+      |> add_if (t1_stats.frontliners = 1) ("T1 1 frontliner", 2)
+      |> add_if (t2_stats.frontliners = 0) ("T2 0 frontliners", 5)
+      |> add_if (t2_stats.frontliners = 1) ("T2 1 frontliner", 2)
+      |> add_if (t1_stats.carries = 0) ("T1 0 carries", 3)
+      |> add_if (t2_stats.carries = 0) ("T2 0 carries", 3)
+      |> add_if (t1_stats.carries > 1) ("T1 2+ carries", t1_stats.carries)
+      |> add_if (t2_stats.carries > 1) ("T2 2+ carries", t2_stats.carries)
+      |> add_if (t1_stats.picks = 0) ("T1 0 picks", 1)
+      |> add_if (t2_stats.picks = 0) ("T2 0 picks", 1)
+      |> add_if (t1_stats.picks > 2) ("T1 2+ picks", t1_stats.picks)
+      |> add_if (t2_stats.picks > 2) ("T2 2+ picks", t2_stats.picks)
+      |> add_if (t1_stats.teamfighters = 0) ("T1 0 teamfighters", 1)
+      |> add_if (t2_stats.teamfighters = 0) ("T2 0 teamfighters", 1)
+      |> add_if (t1_stats.teamfighters > 2) ("T1 2+ teamfighters", t1_stats.teamfighters)
+      |> add_if (t2_stats.teamfighters > 2) ("T2 2+ teamfighters", t2_stats.teamfighters)
     in
+
     let total_points = List.fold points ~init:0 ~f:(fun acc (_, x) -> acc + x) in
-    { hero_by_player; points; total_points; t1_frontliners; t2_frontliners }
+    {
+      hero_by_player;
+      points;
+      total_points;
+      t1_frontliners = t1_stats.frontliners;
+      t2_frontliners = t2_stats.frontliners;
+      t1_carries = t1_stats.carries;
+      t2_carries = t2_stats.carries;
+      t1_picks = t1_stats.picks;
+      t2_picks = t2_stats.picks;
+      t1_teamfighters = t1_stats.teamfighters;
+      t2_teamfighters = t2_stats.teamfighters;
+    }
 end
 
 module Table = Hashtbl.Make (T)
