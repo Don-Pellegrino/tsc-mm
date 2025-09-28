@@ -1,66 +1,57 @@
 open! Core
 
-module Practicing = struct
+module Difficulty = struct
   type t =
-    | More
-    | Usual
-    | Less
-    | Little
+    | Higher
+    | Same
+    | Lower
+    | Dont_know
   [@@deriving sexp, hash]
 
   let of_csv = function
-  | "More than usual!" -> More
-  | "About the same as usual" -> Usual
-  | "Less than usual" -> Less
-  | "I basically haven't been playing Deadlock in the last few weeks" -> Little
-  | s -> failwithf "Invalid Practicing modifier: %S" s ()
-
-  let strength rank practicing =
-    let multiplier =
-      match practicing with
-      | More -> 1.08
-      | Usual -> 1.0
-      | Less -> 0.9
-      | Little -> 0.8
-    in
-    Rank.apply_multiplier rank multiplier
+  | "A lot of my matches are of a HIGHER rank than my own" -> Higher
+  | "They tend to be of the same rank" -> Same
+  | "A lot of my matches are of a LOWER rank than my own" -> Lower
+  | "I don't know and I can't even try to guess" -> Dont_know
+  | s -> failwithf "Invalid Difficulty modifier: %S" s ()
 end
 
-module Queueing = struct
+module Success = struct
   type t =
-    | Solo
-    | One_below
-    | Two_below
-    | One_above
-    | Two_above
-    | Same
+    | Winning
+    | Half
+    | Lose
     | Not_enough
   [@@deriving sexp, hash]
 
   let of_csv = function
-  | "Solo queue 4 lyfe, baby" -> Solo
-  | "Parties usually 1 rank BELOW mine. Example: Arcanist mostly playing with Alchemists" -> One_below
-  | "Parties usually 2+ ranks below BELOW mine. Example: Arcanist mostly playing with Seekers" ->
-    Two_below
-  | "Parties usually 1 rank ABOVE mine. Example: Arcanist mostly playing with Ritualists" -> One_above
-  | "Parties usually 2+ ranks above ABOVE mine. Example: Arcanist mostly playing with Emissary+" ->
-    Two_above
-  | "I pretty much only play with people the same rank as me." -> Same
-  | "I don't play the game enough to know" -> Not_enough
-  | s -> failwithf "Invalid Queueing modifier: %S" s ()
+  | "I've had more wins than losses lately (:" -> Winning
+  | "About 50/50" -> Half
+  | "I've had more losses than wins lately ):" -> Lose
+  | "I basically haven't been playing Deadlock in the last few weeks" -> Not_enough
+  | s -> failwithf "Invalid Success modifier: %S" s ()
+end
 
-  let strength rank queueing =
-    let multiplier =
-      match queueing with
-      | Solo -> 1.0
-      | One_below -> 1.05
-      | Two_below -> 1.1
-      | One_above -> 1.03
-      | Two_above -> 1.06
-      | Same -> 1.03
-      | Not_enough -> 0.95
+module Difficulty_Success = struct
+  let strength rank (difficulty : Difficulty.t) (success : Success.t) =
+    let multiplier, flat =
+      match difficulty, success with
+      | Higher, Winning -> 1.1, 4
+      | Higher, Half -> 1.1, 0
+      | Higher, (Lose | Not_enough) -> 1.0, -2
+      | Same, Winning -> 1.05, 1
+      | Same, Half -> 1.0, 0
+      | Same, Lose -> 0.95, -1
+      | Same, Not_enough -> 0.9, 0
+      | Lower, Winning -> 1.0, -2
+      | Lower, Half -> 1.0, -1
+      | Lower, Lose -> 0.9, -2
+      | Lower, Not_enough -> 0.8, 0
+      | Dont_know, Winning -> 1.0, 1
+      | Dont_know, Half -> 0.95, 0
+      | Dont_know, (Lose | Not_enough) -> 0.90, 0
     in
-    Rank.apply_multiplier rank multiplier
+    flat + Rank.apply_multiplier rank multiplier
 end
 
 module Comms = struct
@@ -84,9 +75,9 @@ module Comms = struct
   let strength rank comms =
     let multiplier =
       match comms with
-      | Lead -> 1.1
-      | Backup -> 1.05
-      | Basic -> 1.02
+      | Lead -> 1.05
+      | Backup -> 1.02
+      | Basic -> 1.1
       | Acknowledging -> 1.0
       | Locked_in -> 0.9
     in

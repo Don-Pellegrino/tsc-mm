@@ -3,8 +3,8 @@ open! Core
 type t = private {
   name: string;
   rank: Rank.t;
-  practicing: Modifier.Practicing.t;
-  queueing: Modifier.Queueing.t;
+  difficulty: Modifier.Difficulty.t;
+  success: Modifier.Success.t;
   comms: Modifier.Comms.t;
   main_hero_pool: Hero.Set.t;
   secondary_hero_pool: Hero.Set.t;
@@ -16,8 +16,8 @@ type t = private {
 val create :
   name:string ->
   Rank.t ->
-  Modifier.Practicing.t ->
-  Modifier.Queueing.t ->
+  Modifier.Difficulty.t ->
+  Modifier.Success.t ->
   Modifier.Comms.t ->
   Hero.t list ->
   Hero.t list ->
@@ -26,8 +26,8 @@ val create :
 val of_csv :
   name:string ->
   rank:string ->
-  practicing:string ->
-  queueing:string ->
+  difficulty:string ->
+  success:string ->
   comms:string ->
   main_hero_pool:string ->
   secondary_hero_pool:string ->

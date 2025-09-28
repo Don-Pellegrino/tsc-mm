@@ -13,15 +13,15 @@ type t =
 [@@deriving sexp, hash]
 
 let strength = function
-| Initiate -> 40
+| Initiate -> 43
 | Seeker -> 50
 | Alchemist -> 58
 | Arcanist -> 67
 | Ritualist -> 77
-| Emissary -> 89
-| Archon -> 102
-| Oracle -> 117
-| Phantom -> 134
+| Emissary -> 88
+| Archon -> 100
+| Oracle -> 113
+| Phantom -> 127
 
 let apply_multiplier rank multiplier =
   Float.(of_int (strength rank) * (multiplier - 1.0)) |> Float.round_nearest_half_to_even |> Float.to_int
