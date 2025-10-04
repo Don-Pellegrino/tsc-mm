@@ -1,15 +1,25 @@
 open! Core
 
+type strength = {
+  rank: int;
+  main_hero_pool: int;
+  secondary_hero_pool: int;
+  difficulty_success: int;
+  comms: int;
+}
+[@@deriving sexp]
+
 module T = struct
   type t = {
     name: string;
     rank: Rank.t;
     difficulty: Modifier.Difficulty.t;
     success: Modifier.Success.t;
-    comms: Modifier.Comms.t;
+    comms: Modifier.Comms.Set.t;
     main_hero_pool: Hero.Set.t;
     secondary_hero_pool: Hero.Set.t;
     unselected_hero_pool: Hero.Set.t;
+    strength_debug: (strength[@hash.ignore]);
     strength: int;
   }
   [@@deriving sexp, hash]
@@ -23,12 +33,19 @@ let create ~name rank difficulty success comms main_hero_pool secondary_hero_poo
   let main_hero_pool = Hero.Set.of_list main_hero_pool in
   let secondary_hero_pool = Set.diff (Hero.Set.of_list secondary_hero_pool) main_hero_pool in
   let unselected_hero_pool = Set.diff Hero.all_set (Set.union main_hero_pool secondary_hero_pool) in
+  let comms = Modifier.Comms.Set.of_list comms in
+  let strength_debug =
+    {
+      rank = Rank.strength rank;
+      main_hero_pool = min 5 (Set.length main_hero_pool);
+      secondary_hero_pool = min 3 (Set.length secondary_hero_pool / 2);
+      difficulty_success = Modifier.Difficulty_Success.strength rank difficulty success;
+      comms = Modifier.Comms.strength ~name rank comms;
+    }
+  in
   let strength =
-    Rank.strength rank
-    + min 5 (Set.length main_hero_pool)
-    + min 3 (Set.length secondary_hero_pool / 2)
-    + Modifier.Difficulty_Success.strength rank difficulty success
-    + Modifier.Comms.strength rank comms
+    let { rank; main_hero_pool; secondary_hero_pool; difficulty_success; comms } = strength_debug in
+    rank + main_hero_pool + secondary_hero_pool + difficulty_success + comms
   in
   {
     name;
@@ -39,6 +56,7 @@ let create ~name rank difficulty success comms main_hero_pool secondary_hero_poo
     main_hero_pool;
     secondary_hero_pool;
     unselected_hero_pool;
+    strength_debug;
     strength;
   }
 
@@ -71,7 +89,7 @@ let of_csv ~name ~rank ~difficulty ~success ~comms ~main_hero_pool ~secondary_he
   let rank = Rank.of_csv rank in
   let difficulty = Modifier.Difficulty.of_csv difficulty in
   let success = Modifier.Success.of_csv success in
-  let comms = Modifier.Comms.of_csv comms in
+  let comms = parse_list Modifier.Comms.of_csv comms in
   let main_hero_pool = parse_list Hero.of_csv main_hero_pool in
   let secondary_hero_pool = parse_list Hero.of_csv secondary_hero_pool in
   create ~name rank difficulty success comms main_hero_pool secondary_hero_pool

@@ -10,19 +10,18 @@ let all_players =
 let players =
   [
     "Don Pellegrino";
-    "Pony Soprano";
-    "nipnop";
-    "FROSTY";
+    "Swinton";
+    "yeetorbyeetn";
     "Milkaholic";
-    "Browning";
-    "ijustagurl";
-    "Adan Davis";
-    "Nekolyte";
-    (* "Shwabba Frog"; *)
     "PO3M_34";
+    "Ijustagirl";
+    "nipnop";
     "Wool";
-    "- Swinton";
-    (* "tsu"; *)
+    "Browning";
+    "Pony Soprano";
+    "Drubinda";
+    "tsu";
+    (* "gema"; *)
   ]
   |> List.map ~f:(Map.find_exn all_players)
 

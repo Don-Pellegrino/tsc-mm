@@ -53,6 +53,8 @@ module Random_heroes = struct
   [@@deriving sexp]
 
   type priorities =
+    (* TODO: add Primary *)
+    (* TODO: add a CLI option to turn off Alchemist special treatment *)
     | Tertiary
     | Secondary
 
@@ -97,12 +99,12 @@ module Random_heroes = struct
       Array.fold all_players ~init:(Hero.Map.empty, []) ~f:(fun acc player ->
         let order =
           match priorities, player with
-          | Tertiary, { rank = Initiate | Alchemist; secondary_hero_pool; main_hero_pool; _ } ->
-            [ secondary_hero_pool, 0; main_hero_pool, 1; Hero.all_set, 10 ]
+          (* | Tertiary, { rank = Initiate | Alchemist; secondary_hero_pool; main_hero_pool; _ } ->
+             [ secondary_hero_pool, 0; main_hero_pool, 1; Hero.all_set, 10 ] *)
           | Tertiary, { unselected_hero_pool; secondary_hero_pool; main_hero_pool; _ } ->
             [ unselected_hero_pool, 0; secondary_hero_pool, 1; main_hero_pool, 6 ]
-          | Secondary, { rank = Initiate | Alchemist; secondary_hero_pool; main_hero_pool; _ } ->
-            [ main_hero_pool, 0; secondary_hero_pool, 1; Hero.all_set, 10 ]
+          (* | Secondary, { rank = Initiate | Alchemist; secondary_hero_pool; main_hero_pool; _ } ->
+             [ main_hero_pool, 0; secondary_hero_pool, 1; Hero.all_set, 10 ] *)
           | Secondary, { unselected_hero_pool; secondary_hero_pool; main_hero_pool; _ } ->
             [ secondary_hero_pool, 0; unselected_hero_pool, 1; main_hero_pool, 6 ]
         in

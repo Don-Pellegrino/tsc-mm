@@ -55,31 +55,49 @@ module Difficulty_Success = struct
 end
 
 module Comms = struct
-  type t =
-    | Lead
-    | Backup
-    | Basic
-    | Acknowledging
-    | Locked_in
-  [@@deriving sexp, hash]
+  module T = struct
+    type t =
+      | Macro
+      | Picks
+      | Help
+      | Cooldowns
+      | Items
+      | Timers
+      | Quiet
+    [@@deriving sexp, compare, hash]
+  end
+
+  include T
+  module CSet = Set
+
+  module Set = struct
+    include Set.Make (T)
+    include Provide_hash (T)
+  end
 
   let of_csv = function
-  | "I tend to lead and make a lot of big macro calls" -> Lead
-  | "I'll lead and make macro calls but only if no one else does" -> Backup
-  | "I communicate but I rarely try to direct my team" -> Basic
-  | "I'm mostly just listening and acknowledging" -> Acknowledging
-  | "I'm too locked in to speak. The team can play chess all they want, I'm just here for blood" ->
-    Locked_in
-  | s -> failwithf "Invalid Pressure modifier: %S" s ()
+  | "I discuss/make important macro calls for my team" -> Macro
+  | "I call out potential ganks and picks" -> Picks
+  | "I call for help when needed" -> Help
+  | "I keep my team aware of my important cooldowns" -> Cooldowns
+  | "I keep my team informed of the enemy's important items" -> Items
+  | "I keep track of timers (buffs, midboss) for my team" -> Timers
+  | "I don't use my microphone much during a match" -> Quiet
+  | s -> failwithf "Invalid Comms modifier: %S" s ()
 
-  let strength rank comms =
-    let multiplier =
-      match comms with
-      | Lead -> 1.05
-      | Backup -> 1.02
-      | Basic -> 1.1
-      | Acknowledging -> 1.0
-      | Locked_in -> 0.9
+  let strength ~name rank comms =
+    let comms, quiet =
+      CSet.partition_tf comms ~f:(function
+        | Quiet -> false
+        | _ -> true )
+      |> Tuple2.map_snd ~f:(fun x -> CSet.is_empty x |> not)
     in
-    Rank.apply_multiplier rank multiplier
+    let len = CSet.length comms |> Float.of_int |> Float.( * ) 0.01 in
+    let multiplier = len |> Float.( * ) (if quiet then 0.5 else 2.0) |> Float.( + ) 1.0 in
+    let ret = Rank.apply_multiplier rank multiplier in
+    print_endline
+      (sprintf
+         !"--- %s ---\nQuiet: %b\nLen: %f\nMultiplier: %f\nStrength: %d"
+         name quiet len multiplier ret );
+    ret
 end
