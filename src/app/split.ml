@@ -11,6 +11,11 @@ let create t1 t2 =
   | 1 -> t2, t1
   | _ -> t1, t2
 
+let players_together (t1, _) (p1, p2) =
+  let p1_team = Team.has_player t1 p1 in
+  let p2_team = Team.has_player t1 p2 in
+  Bool.( = ) p1_team p2_team
+
 let teams (t1, t2) =
   let t1_has_first_pick =
     let top2_even (team : Team.t) =

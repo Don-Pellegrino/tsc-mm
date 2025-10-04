@@ -6,6 +6,8 @@ module Table : Hashtbl.S with type key = t
 
 val create : Team.t -> Team.t -> t
 
+val players_together : t -> Player.t * Player.t -> bool
+
 val teams : t -> [ `Amber of Team.t ] * [ `Sapphire of Team.t ]
 
 val imbalance : t -> int

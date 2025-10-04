@@ -9,7 +9,8 @@ module Dedupe = Map.Make (struct
 end)
 
 let run players priorities splits () =
-  print_endline (sprintf !"%{sexp: Player.t list}" players);
+  print_endline
+    (sprintf !"Initial number of splits: %d\n%{sexp: Player.t list}" (List.length splits) players);
   let acceptable_splits =
     List.filter_map splits ~f:(fun (split, imbalance) ->
       Option.some_if (imbalance <= max_imbalance) split )
@@ -25,16 +26,15 @@ let run players priorities splits () =
         acc )
   in
 
-  let () =
-    (* Inspect a specific player *)
-    let acc = Hero.Table.create () in
-    let target = List.nth_exn players 0 in
-    print_endline Player.(sprintf "Inspecting %s" target.name);
-    Map.iter splits ~f:(fun (_, { hero_by_player; _ }) ->
-      Hashtbl.incr acc (Map.find_exn hero_by_player target) );
-    print_endline (sprintf !"%{sexp: int Hero.Table.t}\n" acc)
-  in
-
+  (* let () =
+       (* Inspect a specific player *)
+       let acc = Hero.Table.create () in
+       let target = List.nth_exn players 0 in
+       print_endline Player.(sprintf "Inspecting %s" target.name);
+       Map.iter splits ~f:(fun (_, { hero_by_player; _ }) ->
+         Hashtbl.incr acc (Map.find_exn hero_by_player target) );
+       print_endline (sprintf !"%{sexp: int Hero.Table.t}\n" acc)
+     in *)
   let num_splits = Map.length splits in
   let split, Split.Random_heroes.{ hero_by_player; points; total_points; _ } =
     Map.nth_exn splits (Random.int num_splits) |> snd

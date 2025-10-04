@@ -85,7 +85,7 @@ module Comms = struct
   | "I don't use my microphone much during a match" -> Quiet
   | s -> failwithf "Invalid Comms modifier: %S" s ()
 
-  let strength ~name rank comms =
+  let strength rank comms =
     let comms, quiet =
       CSet.partition_tf comms ~f:(function
         | Quiet -> false
@@ -94,10 +94,5 @@ module Comms = struct
     in
     let len = CSet.length comms |> Float.of_int |> Float.( * ) 0.01 in
     let multiplier = len |> Float.( * ) (if quiet then 0.5 else 2.0) |> Float.( + ) 1.0 in
-    let ret = Rank.apply_multiplier rank multiplier in
-    print_endline
-      (sprintf
-         !"--- %s ---\nQuiet: %b\nLen: %f\nMultiplier: %f\nStrength: %d"
-         name quiet len multiplier ret );
-    ret
+    Rank.apply_multiplier rank multiplier
 end

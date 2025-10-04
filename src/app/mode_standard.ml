@@ -2,7 +2,7 @@ open! Core
 
 let run ~offset splits () =
   let split, imbalance = List.nth_exn splits offset in
-  print_endline (sprintf !"%{sexp: Split.t}" split);
+  print_endline (sprintf !"Number of splits: %d\n%{sexp: Split.t}" (List.length splits) split);
 
   let `Amber amber, `Sapphire sapphire = Split.teams split in
   print_endline

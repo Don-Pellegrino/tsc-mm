@@ -25,9 +25,17 @@ let players =
   ]
   |> List.map ~f:(Map.find_exn all_players)
 
+let enforce_pairings =
+  [| "Drubinda", "Pony Soprano"; "Swinton", "Ijustagirl" |]
+  |> Array.map ~f:(Tuple2.map ~f:(Map.find_exn all_players))
+
 let () =
   let len = List.length players in
-  if len <> 12 then failwithf "Expected 12 players in the list, but found %d" len ()
+  if len <> 12 then failwithf "Expected 12 players in the list, but found %d" len ();
+  Array.iter enforce_pairings ~f:(fun (x, y) ->
+    let equal = Player.equal in
+    if not (List.mem players x ~equal && List.mem players y ~equal)
+    then failwithf "Enforced pair not in active players: %s, %s" x.name y.name () )
 
 let make_splits () =
   let rec generate t1 n1 t2 n2 tbl = function
@@ -44,7 +52,9 @@ let make_splits () =
   let tbl = Split.Table.create () in
   generate [] 0 [] 0 tbl players;
 
-  Hashtbl.to_alist tbl
+  Hashtbl.filteri tbl ~f:(fun ~key:split ~data:_ ->
+    Array.for_all enforce_pairings ~f:(Split.players_together split) )
+  |> Hashtbl.to_alist
   |> List.stable_sort ~compare:(fun (_split1, imb1) (_split2, imb2) -> [%compare: int] imb1 imb2)
 
 let () =

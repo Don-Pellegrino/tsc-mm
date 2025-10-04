@@ -21,7 +21,7 @@ type t = private {
   strength_debug: (strength[@hash.ignore]);
   strength: int;
 }
-[@@deriving sexp, compare, hash]
+[@@deriving sexp, compare, equal, hash]
 
 val create :
   name:string ->

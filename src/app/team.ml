@@ -34,6 +34,8 @@ let create players =
   in
   { players; main_hero_pool; total_hero_pool; main_hero_pool_size; total_hero_pool_size; strength }
 
+let has_player team player = List.mem ~equal:Player.equal team.players player
+
 let to_string ~show_strength = function
 | { players; _ } when show_strength -> List.map players ~f:Player.to_string |> String.concat ~sep:", "
 | { players; _ } ->

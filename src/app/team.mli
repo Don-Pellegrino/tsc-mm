@@ -12,6 +12,8 @@ type t = private {
 
 val create : Player.t list -> t
 
+val has_player : t -> Player.t -> bool
+
 val to_string : show_strength:bool -> t -> string
 
 val strength : t -> int

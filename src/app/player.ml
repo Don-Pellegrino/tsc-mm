@@ -25,6 +25,8 @@ module T = struct
   [@@deriving sexp, hash]
 
   let compare x y = [%compare: string] x.name y.name
+
+  let equal x y = compare x y = 0
 end
 
 include T
@@ -40,7 +42,7 @@ let create ~name rank difficulty success comms main_hero_pool secondary_hero_poo
       main_hero_pool = min 5 (Set.length main_hero_pool);
       secondary_hero_pool = min 3 (Set.length secondary_hero_pool / 2);
       difficulty_success = Modifier.Difficulty_Success.strength rank difficulty success;
-      comms = Modifier.Comms.strength ~name rank comms;
+      comms = Modifier.Comms.strength rank comms;
     }
   in
   let strength =
