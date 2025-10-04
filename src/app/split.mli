@@ -35,10 +35,11 @@ module Random_heroes : sig
   [@@deriving sexp]
 
   type priorities =
-    | Tertiary
+    | Primary
     | Secondary
+    | Tertiary
 
   val priorities_to_string : priorities -> string
 
-  val generate : priorities -> t0 -> t
+  val generate : priorities -> t0 -> help_alchemists:bool -> t
 end

@@ -25,9 +25,7 @@ let players =
   ]
   |> List.map ~f:(Map.find_exn all_players)
 
-let enforce_pairings =
-  [| "Drubinda", "Pony Soprano"; "Swinton", "Ijustagirl" |]
-  |> Array.map ~f:(Tuple2.map ~f:(Map.find_exn all_players))
+let enforce_pairings = [||] |> Array.map ~f:(Tuple2.map ~f:(Map.find_exn all_players))
 
 let () =
   let len = List.length players in
@@ -89,8 +87,13 @@ let () =
   let random =
     let random (priorities : Split.Random_heroes.priorities) =
       let random =
-        let%map () = Param.return () in
-        Mode_random.run players priorities splits
+        let%map no_help_alchemists =
+          Param.(
+            flag "--no-help-alchemists" no_arg ~aliases:[] ~full_flag_required:()
+              ~doc:"Do not give Alchemists and below a more familiar hero" )
+        in
+        let help_alchemists = not no_help_alchemists in
+        Mode_random.run players priorities ~help_alchemists splits
       in
       let summary =
         sprintf
@@ -99,10 +102,11 @@ let () =
       in
       basic ~summary random
     in
+    let primary = random Primary in
     let secondary = random Secondary in
     let tertiary = random Tertiary in
     group ~summary:"Teams and heroes are assigned automatically" ~preserve_subcommand_order:()
-      [ "secondary", secondary; "tertiary", tertiary ]
+      [ "primary", primary; "secondary", secondary; "tertiary", tertiary ]
   in
   group ~summary:"The Scrap Circuit's matchmaker" ~preserve_subcommand_order:()
     [
