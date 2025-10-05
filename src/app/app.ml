@@ -91,9 +91,13 @@ let () =
           Param.(
             flag "--no-help-alchemists" no_arg ~aliases:[] ~full_flag_required:()
               ~doc:"Do not give Alchemists and below a more familiar hero" )
+        and inspect =
+          Param.(
+            flag "-i" (optional string) ~aliases:[ "--inspect" ] ~full_flag_required:()
+              ~doc:"NAME Inspect the hero odds for this player" )
         in
         let help_alchemists = not no_help_alchemists in
-        Mode_random.run players priorities ~help_alchemists splits
+        Mode_random.run players priorities ~help_alchemists ~inspect splits
       in
       let summary =
         sprintf
