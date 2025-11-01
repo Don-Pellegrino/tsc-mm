@@ -154,12 +154,12 @@ let is_carry = function
 | Haze -> true
 | Holliday -> false
 | Infernus -> true
-| Ivy -> false
+| Ivy -> true
 | Kelvin -> false
 | Lady_Geist -> false
 | Lash -> false
 | McGinnis -> false
-| Mina -> false
+| Mina -> true
 | Mirage -> true
 | Mo_Krill -> false
 | Paige -> false
@@ -226,8 +226,8 @@ let is_teamfighter = function
 | Kelvin -> true
 | Lady_Geist -> false
 | Lash -> true
-| McGinnis -> true
-| Mina -> false
+| McGinnis -> false
+| Mina -> true
 | Mirage -> false
 | Mo_Krill -> false
 | Paige -> false

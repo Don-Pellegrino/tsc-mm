@@ -44,10 +44,9 @@ let run players priorities ~help_alchemists ~inspect splits () =
         List.find players ~f:(fun p -> String.( = ) name p.name)
         |> Option.value_exn ~message:"Could not find a player of this name to inspect"
       in
-      print_endline Player.(sprintf "Inspecting %s" target.name);
       Map.iter splits ~f:(fun (_, { hero_by_player; _ }) ->
         Hashtbl.incr acc (Map.find_exn hero_by_player target) );
-      print_endline (sprintf !"%{sexp: int Hero.Table.t}\n" acc)
+      print_endline (sprintf !"\nInspecting %s:\n%{sexp: int Hero.Table.t}\n" target.name acc)
   in
   let split, Split.Random_heroes.{ hero_by_player; points; total_points; _ } =
     Map.nth_exn splits (Random.int num_splits) |> snd

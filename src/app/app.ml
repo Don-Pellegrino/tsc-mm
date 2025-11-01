@@ -18,10 +18,14 @@ let players =
     "nipnop";
     "Wool";
     "Browning";
-    "Pony Soprano";
+    (* "Pony Soprano"; *)
     "Drubinda";
-    "tsu";
+    (* "tsu"; *)
     (* "gema"; *)
+    (* "frosty"; *)
+    (* "Agerikk"; *)
+    "Izzy";
+    "skull";
   ]
   |> List.map ~f:(Map.find_exn all_players)
 
@@ -89,7 +93,7 @@ let () =
       let random =
         let%map no_help_alchemists =
           Param.(
-            flag "--no-help-alchemists" no_arg ~aliases:[] ~full_flag_required:()
+            flag "-n" no_arg ~aliases:[ "--no-help-alchemists" ] ~full_flag_required:()
               ~doc:"Do not give Alchemists and below a more familiar hero" )
         and inspect =
           Param.(

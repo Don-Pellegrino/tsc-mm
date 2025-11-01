@@ -16,19 +16,22 @@ let players_together (t1, _) (p1, p2) =
   let p2_team = Team.has_player t1 p2 in
   Bool.( = ) p1_team p2_team
 
-let teams (t1, t2) =
+let teams ((t1 : Team.t), (t2 : Team.t)) =
   let t1_has_first_pick =
     let top2_even (team : Team.t) =
       match team.players with
       | [ p1; p2; _p3; _p4; _p5; _p6 ] -> p1.strength = p2.strength
       | _ -> failwithf !"Impossible case at %{Source_code_position}" [%here] ()
     in
-    match top2_even t1, top2_even t2 with
-    | true, true
-     |false, false ->
+    match Int.compare t1.strength t2.strength, top2_even t1, top2_even t2 with
+    | -1, _, _ -> true
+    | 1, _, _ -> false
+    | 0, true, true
+     |0, false, false ->
       Random.bool ()
-    | true, false -> false
-    | false, true -> true
+    | 0, true, false -> false
+    | 0, false, true -> true
+    | x, _, _ -> failwithf "Unexpected team strength comparison: %d" x ()
   in
   let amber, sapphire = if t1_has_first_pick then t1, t2 else t2, t1 in
   `Amber amber, `Sapphire sapphire
@@ -147,16 +150,16 @@ module Random_heroes = struct
       |> add_if (t2_stats.frontliners = 1) ("T2 1 frontliner", 2)
       |> add_if (t1_stats.carries = 0) ("T1 0 carries", 3)
       |> add_if (t2_stats.carries = 0) ("T2 0 carries", 3)
-      |> add_if (t1_stats.carries > 1) ("T1 2+ carries", t1_stats.carries)
-      |> add_if (t2_stats.carries > 1) ("T2 2+ carries", t2_stats.carries)
+      |> add_if (t1_stats.carries > 2) ("T1 3+ carries", t1_stats.carries)
+      |> add_if (t2_stats.carries > 2) ("T2 3+ carries", t2_stats.carries)
       |> add_if (t1_stats.picks = 0) ("T1 0 picks", 1)
       |> add_if (t2_stats.picks = 0) ("T2 0 picks", 1)
-      |> add_if (t1_stats.picks > 2) ("T1 2+ picks", t1_stats.picks)
-      |> add_if (t2_stats.picks > 2) ("T2 2+ picks", t2_stats.picks)
+      |> add_if (t1_stats.picks > 2) ("T1 3+ picks", t1_stats.picks)
+      |> add_if (t2_stats.picks > 2) ("T2 3+ picks", t2_stats.picks)
       |> add_if (t1_stats.teamfighters = 0) ("T1 0 teamfighters", 1)
       |> add_if (t2_stats.teamfighters = 0) ("T2 0 teamfighters", 1)
-      |> add_if (t1_stats.teamfighters > 2) ("T1 2+ teamfighters", t1_stats.teamfighters)
-      |> add_if (t2_stats.teamfighters > 2) ("T2 2+ teamfighters", t2_stats.teamfighters)
+      |> add_if (t1_stats.teamfighters > 2) ("T1 3+ teamfighters", t1_stats.teamfighters)
+      |> add_if (t2_stats.teamfighters > 2) ("T2 3+ teamfighters", t2_stats.teamfighters)
     in
 
     let total_points = List.fold points ~init:0 ~f:(fun acc (_, x) -> acc + x) in
