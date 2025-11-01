@@ -1,13 +1,17 @@
 open! Core
 
-type strength = private {
-  rank: int;
-  main_hero_pool: int;
-  secondary_hero_pool: int;
-  difficulty_success: int;
-  comms: int;
-}
-[@@deriving sexp]
+module Strength : sig
+  type t = private {
+    rank: int;
+    main_hero_pool: int;
+    secondary_hero_pool: int;
+    difficulty_success: int;
+    comms: int;
+  }
+  [@@deriving sexp, compare]
+
+  val total_strength : t -> int
+end
 
 type t = private {
   name: string;
@@ -18,8 +22,8 @@ type t = private {
   main_hero_pool: Hero.Set.t;
   secondary_hero_pool: Hero.Set.t;
   unselected_hero_pool: Hero.Set.t;
-  strength_debug: (strength[@hash.ignore]);
-  strength: int;
+  strength: Strength.t;
+  total_strength: int;
 }
 [@@deriving sexp, compare, equal, hash]
 
@@ -44,7 +48,5 @@ val of_csv :
   t
 
 val to_string : t -> string
-
-val strength : t -> int
 
 module Map : Map.S with type Key.t = t

@@ -10,22 +10,19 @@ let all_players =
 let players =
   [
     "Don Pellegrino";
-    "Swinton";
-    "yeetorbyeetn";
-    "Milkaholic";
     "PO3M_34";
-    "Ijustagirl";
-    "nipnop";
-    "Wool";
-    "Browning";
-    (* "Pony Soprano"; *)
+    "ShwabbaFrog";
     "Drubinda";
+    "Songaholic";
+    "Browning";
+    "Yeetorbyeetn";
+    "Frosty";
+    "nipnop";
+    "Arrowsords";
+    "Pony Soprano";
+    "flockthebird";
     (* "tsu"; *)
     (* "gema"; *)
-    (* "frosty"; *)
-    (* "Agerikk"; *)
-    "Izzy";
-    "skull";
   ]
   |> List.map ~f:(Map.find_exn all_players)
 
@@ -91,17 +88,22 @@ let () =
   let random =
     let random (priorities : Split.Random_heroes.priorities) =
       let random =
-        let%map no_help_alchemists =
+        let%map no_help_low_ranks =
           Param.(
-            flag "-n" no_arg ~aliases:[ "--no-help-alchemists" ] ~full_flag_required:()
-              ~doc:"Do not give Alchemists and below a more familiar hero" )
+            flag "-nl" no_arg ~aliases:[ "--no-help-low-ranks" ] ~full_flag_required:()
+              ~doc:"Do not give Ritualist and below a more familiar hero" )
+        and no_handicap_high_ranks =
+          Param.(
+            flag "-nh" no_arg ~aliases:[ "--no-handicap-high-ranks" ] ~full_flag_required:()
+              ~doc:"Do not give Ascendant and above a less familiar hero" )
         and inspect =
           Param.(
             flag "-i" (optional string) ~aliases:[ "--inspect" ] ~full_flag_required:()
               ~doc:"NAME Inspect the hero odds for this player" )
         in
-        let help_alchemists = not no_help_alchemists in
-        Mode_random.run players priorities ~help_alchemists ~inspect splits
+        let help_low_ranks = not no_help_low_ranks in
+        let handicap_high_ranks = not no_handicap_high_ranks in
+        Mode_random.run players priorities ~help_low_ranks ~handicap_high_ranks ~inspect splits
       in
       let summary =
         sprintf

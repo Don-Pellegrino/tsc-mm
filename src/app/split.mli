@@ -41,5 +41,5 @@ module Random_heroes : sig
 
   val priorities_to_string : priorities -> string
 
-  val generate : priorities -> t0 -> help_alchemists:bool -> t
+  val generate : priorities -> t0 -> help_low_ranks:bool -> handicap_high_ranks:bool -> t
 end

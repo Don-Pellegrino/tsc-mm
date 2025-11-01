@@ -1,5 +1,48 @@
 open! Core
 
+module Strength = struct
+  type t = {
+    player_strengths: Player.Strength.t list;
+    total_player_strength: int;
+    top_player_bonus: int;
+    main_hero_pool_size_bonus: int;
+    total_hero_pool_size_bonus: int;
+  }
+  [@@deriving sexp, compare]
+
+  let total
+    {
+      player_strengths = _;
+      total_player_strength;
+      top_player_bonus;
+      main_hero_pool_size_bonus;
+      total_hero_pool_size_bonus;
+    } =
+    total_player_strength + top_player_bonus + main_hero_pool_size_bonus + total_hero_pool_size_bonus
+
+  let to_string
+    ( {
+        player_strengths;
+        total_player_strength;
+        top_player_bonus;
+        main_hero_pool_size_bonus;
+        total_hero_pool_size_bonus;
+      } as strength ) =
+    let total_player_comms, total_player_pools =
+      List.fold player_strengths ~init:(0, 0) ~f:(fun (acc_comms, acc_pools) ps ->
+        acc_comms + ps.comms, acc_pools + ps.main_hero_pool + ps.secondary_hero_pool )
+    in
+    sprintf
+      "- Total player strength: %d\n\
+      \  - From comms: %d\n\
+      \  - From hero pools: %d\n\
+       - Top player bonus: %d\n\
+       - Bonus for mains hero pool size: %d\n\
+       - Bonus for draft strength: %d\n\
+       TOTAL: **%d**" total_player_strength total_player_comms total_player_pools top_player_bonus
+      main_hero_pool_size_bonus total_hero_pool_size_bonus (total strength)
+end
+
 module T = struct
   type t = {
     players: Player.t list;
@@ -7,18 +50,21 @@ module T = struct
     total_hero_pool: Hero.Set.t;
     main_hero_pool_size: int;
     total_hero_pool_size: int;
-    strength: int;
+    strength: (Strength.t[@hash.ignore]);
+    total_strength: int;
   }
   [@@deriving sexp, compare, hash]
 end
 
 include T
 
-let create players =
-  let max_strength, sum_strength =
-    List.fold players ~init:(0, 0) ~f:(fun (acc_max, acc_sum) p ->
-      let strength = Player.strength p in
-      max strength acc_max, strength + acc_sum )
+let create (players : Player.t list) =
+  let players =
+    List.stable_sort players ~compare:(fun p1 p2 -> [%compare: int] p2.total_strength p1.total_strength)
+  in
+  let (top_player_strength, total_player_strength), player_strengths =
+    List.fold_map players ~init:(0, 0) ~f:(fun (acc_max, acc_sum) { total_strength = x; strength; _ } ->
+      (max acc_max x, acc_sum + x), strength )
   in
   let main_hero_pool, total_hero_pool =
     List.fold players ~init:(Hero.Set.empty, Hero.Set.empty) ~f:(fun (acc_main, acc_total) p ->
@@ -27,12 +73,26 @@ let create players =
   in
   let main_hero_pool_size = Set.length main_hero_pool in
   let total_hero_pool_size = Set.length total_hero_pool in
-
-  let strength = (max_strength / 2) + sum_strength + main_hero_pool_size + (total_hero_pool_size / 2) in
-  let players =
-    List.stable_sort players ~compare:(fun p1 p2 -> [%compare: int] p2.strength p1.strength)
+  let strength =
+    Strength.
+      {
+        player_strengths;
+        total_player_strength;
+        top_player_bonus = top_player_strength / 2;
+        main_hero_pool_size_bonus = Float.(of_int main_hero_pool_size * 1.5 |> to_int);
+        total_hero_pool_size_bonus = total_hero_pool_size;
+      }
   in
-  { players; main_hero_pool; total_hero_pool; main_hero_pool_size; total_hero_pool_size; strength }
+  let total_strength = Strength.total strength in
+  {
+    players;
+    main_hero_pool;
+    total_hero_pool;
+    main_hero_pool_size;
+    total_hero_pool_size;
+    total_strength;
+    strength;
+  }
 
 let has_player team player = List.mem ~equal:Player.equal team.players player
 
@@ -43,15 +103,15 @@ let to_string ~show_strength = function
   Array.permute players;
   Array.map players ~f:(fun p -> sprintf "- %s\n" p.name) |> String.concat_array
 
-let strength { strength; _ } = strength
-
 let random_player_strength_weighted { players; _ } =
-  let total_strength = List.fold players ~init:0 ~f:(fun acc { strength; _ } -> acc + strength) in
+  let total_strength =
+    List.fold players ~init:0 ~f:(fun acc { total_strength; _ } -> acc + total_strength)
+  in
   let n = Random.int total_strength in
   List.fold_until players ~init:0
     ~finish:(fun x -> failwithf "Unexpected termination during random player selection at %d" x ())
-    ~f:(fun acc ({ strength; _ } as p) ->
-      if n < acc + strength then Stop p else Continue (acc + strength))
+    ~f:(fun acc ({ total_strength; _ } as p) ->
+      if n < acc + total_strength then Stop p else Continue (acc + total_strength))
 
 let player_position { players; _ } index = List.nth_exn players index
 

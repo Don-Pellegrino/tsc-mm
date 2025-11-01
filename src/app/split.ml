@@ -20,10 +20,10 @@ let teams ((t1 : Team.t), (t2 : Team.t)) =
   let t1_has_first_pick =
     let top2_even (team : Team.t) =
       match team.players with
-      | [ p1; p2; _p3; _p4; _p5; _p6 ] -> p1.strength = p2.strength
+      | [ p1; p2; _p3; _p4; _p5; _p6 ] -> p1.total_strength = p2.total_strength
       | _ -> failwithf !"Impossible case at %{Source_code_position}" [%here] ()
     in
-    match Int.compare t1.strength t2.strength, top2_even t1, top2_even t2 with
+    match Int.compare t1.total_strength t2.total_strength, top2_even t1, top2_even t2 with
     | -1, _, _ -> true
     | 1, _, _ -> false
     | 0, true, true
@@ -36,9 +36,9 @@ let teams ((t1 : Team.t), (t2 : Team.t)) =
   let amber, sapphire = if t1_has_first_pick then t1, t2 else t2, t1 in
   `Amber amber, `Sapphire sapphire
 
-let imbalance (t1, t2) = Team.strength t1 - Team.strength t2 |> Int.abs
+let imbalance ((t1 : Team.t), (t2 : Team.t)) = t1.total_strength - t2.total_strength |> Int.abs
 
-let strength_total (t1, t2) = Team.strength t1 + Team.strength t2
+let strength_total ((t1 : Team.t), (t2 : Team.t)) = t1.total_strength + t2.total_strength
 
 type player_assignments = Hero.t Player.Map.t [@@deriving sexp, compare]
 
@@ -79,7 +79,7 @@ module Random_heroes = struct
 
   let empty_stats () = { frontliners = 0; carries = 0; picks = 0; teamfighters = 0 }
 
-  let generate priorities ((t1, t2) : t0) ~help_alchemists =
+  let generate priorities ((t1, t2) : t0) ~help_low_ranks ~handicap_high_ranks =
     let pool_diff pool acc = Set.filter pool ~f:(fun h -> Map.mem acc h |> not) in
     let prioritize (acc, points) (player : Player.t) pools =
       List.find_map_exn pools ~f:(fun (pool, penalty) ->
@@ -99,24 +99,30 @@ module Random_heroes = struct
       let random_order () = 1 - Random.int 2 in
       let all_players = Array.append (Array.of_list t1.players) (Array.of_list t2.players) in
       Array.sort all_players ~compare:(fun p1 p2 ->
-        match p1.rank, p2.rank with
-        | (Initiate | Alchemist), (Initiate | Alchemist) -> random_order ()
-        | (Initiate | Alchemist), _ -> -1
-        | _, (Initiate | Alchemist) -> 1
+        match Rank.is_low_rank p1.rank, Rank.is_low_rank p2.rank with
+        | true, true -> random_order ()
+        | true, false -> -1
+        | false, true -> 1
         | _ -> random_order () );
       Array.fold all_players ~init:(Hero.Map.empty, []) ~f:(fun acc player ->
         let order =
           match priorities, player with
-          | Tertiary, { rank = Initiate | Alchemist; secondary_hero_pool; main_hero_pool; _ }
-            when help_alchemists ->
+          | Tertiary, { rank; secondary_hero_pool; main_hero_pool; _ }
+            when help_low_ranks && Rank.is_low_rank rank ->
             [ secondary_hero_pool, 0; main_hero_pool, 1; Hero.all_set, 10 ]
           | Tertiary, { unselected_hero_pool; secondary_hero_pool; main_hero_pool; _ } ->
             [ unselected_hero_pool, 0; secondary_hero_pool, 1; main_hero_pool, 6 ]
-          | Secondary, { rank = Initiate | Alchemist; secondary_hero_pool; main_hero_pool; _ }
-            when help_alchemists ->
+          | Secondary, { rank; secondary_hero_pool; main_hero_pool; _ }
+            when help_low_ranks && Rank.is_low_rank rank ->
             [ main_hero_pool, 0; secondary_hero_pool, 1; Hero.all_set, 10 ]
+          | Secondary, { rank; unselected_hero_pool; secondary_hero_pool; main_hero_pool; _ }
+            when handicap_high_ranks && Rank.is_high_rank rank ->
+            [ unselected_hero_pool, 0; secondary_hero_pool, 1; main_hero_pool, 6 ]
           | Secondary, { unselected_hero_pool; secondary_hero_pool; main_hero_pool; _ } ->
             [ secondary_hero_pool, 0; unselected_hero_pool, 1; main_hero_pool, 6 ]
+          | Primary, { rank; unselected_hero_pool; secondary_hero_pool; main_hero_pool; _ }
+            when handicap_high_ranks && Rank.is_high_rank rank ->
+            [ secondary_hero_pool, 0; main_hero_pool, 2; unselected_hero_pool, 6 ]
           | Primary, { unselected_hero_pool; secondary_hero_pool; main_hero_pool; _ } ->
             [ main_hero_pool, 0; secondary_hero_pool, 2; unselected_hero_pool, 6 ]
         in

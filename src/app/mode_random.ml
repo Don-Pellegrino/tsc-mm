@@ -8,7 +8,7 @@ module Dedupe = Map.Make (struct
   type t = Split.player_assignments [@@deriving sexp, compare]
 end)
 
-let run players priorities ~help_alchemists ~inspect splits () =
+let run players priorities ~help_low_ranks ~handicap_high_ranks ~inspect splits () =
   print_endline (sprintf !"%{sexp: Player.t list}" players);
   let acceptable_splits =
     List.filter_map splits ~f:(fun (split, imbalance) ->
@@ -18,7 +18,9 @@ let run players priorities ~help_alchemists ~inspect splits () =
     List.fold acceptable_splits ~init:Dedupe.empty ~f:(fun acc split ->
       Fn.apply_n_times ~n:100
         (fun acc ->
-          let random = Split.Random_heroes.generate priorities split ~help_alchemists in
+          let random =
+            Split.Random_heroes.generate priorities split ~help_low_ranks ~handicap_high_ranks
+          in
           if random.total_points <= max_points
           then Map.set acc ~key:random.hero_by_player ~data:(split, random)
           else acc)
@@ -62,5 +64,10 @@ let run players priorities ~help_alchemists ~inspect splits () =
          :raised_hand: Amber Hand:\n\
          %s\n\n\
          :gem: Sapphire Flame:\n\
-         %s\n"
-       total_points points (display amber.players) (display sapphire.players) )
+         %s\n\n\
+         :raised_hand: Amber Hand:\n\
+         %{Team.Strength}\n\n\
+         :gem: Sapphire Flame:\n\
+         %{Team.Strength}\n"
+       total_points points (display amber.players) (display sapphire.players) amber.strength
+       sapphire.strength )

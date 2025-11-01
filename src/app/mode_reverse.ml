@@ -22,11 +22,16 @@ let run ~offset submode splits () =
          :raised_hand: Amber Hand Leader: **%s** [FIRST PICK]\n\
          :gem: Sapphire Flame Leader: **%s**\n\n\
          :raised_hand: Amber Hand:\n\
-         %s\n\n\
+         %s\n\
          :gem: Sapphire Flame:\n\
-         %s\n\n\
+         %s\n\
+         :raised_hand: Amber Hand:\n\
+         %{Team.Strength}\n\n\
+         :gem: Sapphire Flame:\n\
+         %{Team.Strength}\n\n\
          %{Team.Hero_players}"
        imbalance amber_player.name sapphire_player.name
        (Team.to_string ~show_strength:false amber)
        (Team.to_string ~show_strength:false sapphire)
+       amber.strength sapphire.strength
        Team.Hero_players.(combine [ of_team amber; of_team sapphire ]) )

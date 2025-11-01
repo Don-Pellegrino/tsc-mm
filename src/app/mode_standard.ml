@@ -12,6 +12,10 @@ let run ~offset splits () =
          %s\n\
          :gem: Sapphire Flame: \n\
          %s\n\
+         :raised_hand: Amber Hand:\n\
+         %{Team.Strength}\n\n\
+         :gem: Sapphire Flame:\n\
+         %{Team.Strength}\n\n\
          Amber Hand (%d): %s\n\
          %{Team.Hero_players}\n\n\
          Sapphire Flame (%d): %s\n\
@@ -19,8 +23,8 @@ let run ~offset splits () =
        imbalance
        (Team.to_string amber ~show_strength:false)
        (Team.to_string sapphire ~show_strength:false)
-       (Team.strength amber)
+       amber.strength sapphire.strength amber.total_strength
        (Team.to_string amber ~show_strength:true)
-       (Team.Hero_players.of_team amber) (Team.strength sapphire)
+       (Team.Hero_players.of_team amber) sapphire.total_strength
        (Team.to_string sapphire ~show_strength:true)
        (Team.Hero_players.of_team sapphire) )
