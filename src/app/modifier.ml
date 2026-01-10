@@ -63,6 +63,7 @@ module Comms = struct
       | Cooldowns
       | Items
       | Timers
+      | Comms
       | Quiet
     [@@deriving sexp, compare, hash]
   end
@@ -82,6 +83,7 @@ module Comms = struct
   | "I keep my team aware of my important cooldowns" -> Cooldowns
   | "I keep my team informed of the enemy's important items" -> Items
   | "I keep track of timers (buffs, midboss) for my team" -> Timers
+  | "My comms are so good they sometimes win games" -> Comms
   | "I don't use my microphone much during a match" -> Quiet
   | s -> failwithf "Invalid Comms modifier: %S" s ()
 

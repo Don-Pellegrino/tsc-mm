@@ -76,10 +76,10 @@ let is_high_rank = function
  |Emissary
  |Archon
  |Oracle
- |Phantom_low
- |Phantom_high ->
+ |Phantom_low ->
   false
-| Ascendant_low
+| Phantom_high
+ |Ascendant_low
  |Ascendant_high
  |Eternus ->
   true

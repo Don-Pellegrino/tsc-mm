@@ -31,7 +31,7 @@ let run ~offset submode splits () =
          %{Team.Strength}\n\n\
          %{Team.Hero_players}"
        imbalance amber_player.name sapphire_player.name
-       (Team.to_string ~show_strength:false amber)
-       (Team.to_string ~show_strength:false sapphire)
+       (Team.to_string amber ~shuffle_order:true ~player_to_string:(fun p -> p.name))
+       (Team.to_string sapphire ~shuffle_order:true ~player_to_string:(fun p -> p.name))
        amber.strength sapphire.strength
        Team.Hero_players.(combine [ of_team amber; of_team sapphire ]) )

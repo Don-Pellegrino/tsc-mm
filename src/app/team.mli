@@ -30,7 +30,7 @@ val create : Player.t list -> t
 
 val has_player : t -> Player.t -> bool
 
-val to_string : show_strength:bool -> t -> string
+val to_string : player_to_string:(Player.t -> string) -> shuffle_order:bool -> t -> string
 
 val random_player_strength_weighted : t -> Player.t
 

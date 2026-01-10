@@ -96,12 +96,10 @@ let create (players : Player.t list) =
 
 let has_player team player = List.mem ~equal:Player.equal team.players player
 
-let to_string ~show_strength = function
-| { players; _ } when show_strength -> List.map players ~f:Player.to_string |> String.concat ~sep:", "
-| { players; _ } ->
+let to_string ~player_to_string ~shuffle_order { players; _ } =
   let players = Array.of_list players in
-  Array.permute players;
-  Array.map players ~f:(fun p -> sprintf "- %s\n" p.name) |> String.concat_array
+  if shuffle_order then Array.permute players;
+  Array.map players ~f:(sprintf !"- %{player_to_string}\n") |> String.concat_array
 
 let random_player_strength_weighted { players; _ } =
   let total_strength =

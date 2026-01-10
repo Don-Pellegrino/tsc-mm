@@ -10,18 +10,23 @@ let all_players =
 let players =
   [
     "Don Pellegrino";
-    "PO3M_34";
-    "ShwabbaFrog";
-    "Drubinda";
-    "Songaholic";
-    "Browning";
-    "Yeetorbyeetn";
-    "Frosty";
+    "dal";
+    "Aveesh";
+    "haversine";
     "nipnop";
-    "Arrowsords";
-    "Pony Soprano";
-    "flockthebird";
-    (* "tsu"; *)
+    (* "Pony Soprano"; *)
+    "NarstyBoy";
+    (* "Tsu"; *)
+    "Adam Davis";
+    "ijustagurl.ttv";
+    "GhoulWizard";
+    (* "Frank Angelo"; *)
+    "frosty40";
+    (* "Sevenhells"; *)
+    "Sour Guava";
+    (* "Gwizz/Drpockets"; *)
+    "Kill";
+    (* "HeySasquatch"; *)
     (* "gema"; *)
   ]
   |> List.map ~f:(Map.find_exn all_players)
@@ -69,8 +74,13 @@ let () =
     if offset < 0 then failwithf "Offset must be >0 but it was %d" offset () else offset
   in
   let standard =
-    let%map offset = offset in
-    Mode_standard.run ~offset splits
+    let%map offset = offset
+    and items =
+      Param.(
+        flag "-i" no_arg ~aliases:[ "--items" ] ~full_flag_required:()
+          ~doc:"Pick a random T4 item for each player" )
+    in
+    Mode_standard.run ~offset ~items splits
   in
   let reverse =
     let%map offset = offset

@@ -45,8 +45,18 @@ let create ~name rank difficulty success comms main_hero_pool secondary_hero_poo
     Strength.
       {
         rank = Rank.strength rank;
-        main_hero_pool = min 5 (Set.length main_hero_pool);
-        secondary_hero_pool = min 3 (Set.length secondary_hero_pool / 2);
+        main_hero_pool =
+          min 3 (Set.length main_hero_pool)
+          |> Float.of_int
+          |> Float.( * ) 0.02
+          |> Float.( + ) 1.0
+          |> Rank.apply_multiplier rank;
+        secondary_hero_pool =
+          min 5 (Set.length secondary_hero_pool)
+          |> Float.of_int
+          |> Float.( * ) 0.01
+          |> Float.( + ) 1.0
+          |> Rank.apply_multiplier rank;
         difficulty_success = Modifier.Difficulty_Success.strength rank difficulty success;
         comms = Modifier.Comms.strength rank comms;
       }
