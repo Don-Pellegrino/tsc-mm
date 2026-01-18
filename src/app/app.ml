@@ -3,33 +3,11 @@ open! Core
 let () = Random.self_init ()
 
 let all_players =
-  Import.of_filename "tsc.csv"
+  Import.Form.of_filename "tsc.csv"
   |> Array.fold ~init:String.Map.empty ~f:(fun acc player ->
        Map.add_exn acc ~key:player.name ~data:player )
 
-let players =
-  [
-    "Don Pellegrino";
-    "dal";
-    "Aveesh";
-    "haversine";
-    "nipnop";
-    (* "Pony Soprano"; *)
-    "NarstyBoy";
-    (* "Tsu"; *)
-    "Adam Davis";
-    "ijustagurl.ttv";
-    "GhoulWizard";
-    (* "Frank Angelo"; *)
-    "frosty40";
-    (* "Sevenhells"; *)
-    "Sour Guava";
-    (* "Gwizz/Drpockets"; *)
-    "Kill";
-    (* "HeySasquatch"; *)
-    (* "gema"; *)
-  ]
-  |> List.map ~f:(Map.find_exn all_players)
+let players = Import.Players.of_filename "players.csv" |> List.map ~f:(Map.find_exn all_players)
 
 let enforce_pairings = [||] |> Array.map ~f:(Tuple2.map ~f:(Map.find_exn all_players))
 

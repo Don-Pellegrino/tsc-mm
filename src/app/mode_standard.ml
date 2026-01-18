@@ -1,12 +1,26 @@
 open! Core
 
+let funny_items = Items.T4.[| Magic_Carpet; Cheat_Death |]
+
 let run ~offset ~items splits () =
   let split, imbalance = List.nth_exn splits offset in
   print_endline (sprintf !"Number of splits: %d\n%{sexp: Split.t}" (List.length splits) split);
 
   let `Amber amber, `Sapphire sapphire = Split.teams split in
   let player_to_string =
-    let shuffled_items = ref (List.permute Items.T4.all) in
+    let shuffled_items =
+      let all_except_funny =
+        Items.T4.all
+        |> Array.of_list
+        |> Array.filter ~f:(fun item -> not (Array.mem funny_items ~equal:[%equal: Items.T4.t] item))
+      in
+      Array.permute all_except_funny;
+      let twelve =
+        Array.concat [ funny_items; Array.slice all_except_funny 0 (12 - Array.length funny_items) ]
+      in
+      Array.permute twelve;
+      ref (Array.to_list twelve)
+    in
     let take_one () =
       match !shuffled_items with
       | x :: rest ->

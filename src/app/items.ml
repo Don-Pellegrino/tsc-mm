@@ -46,7 +46,7 @@ module T4 = struct
     | Spirit_Burn
     | Transcendant_Cooldown
     | Vortex_Web
-  [@@deriving sexp, enumerate]
+  [@@deriving sexp, compare, equal, enumerate]
 
   let to_string = function
   | Armor_piercing_rounds -> "Armor piercing rounds"
