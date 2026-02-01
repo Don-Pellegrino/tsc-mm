@@ -9,6 +9,7 @@ module T = struct
     | Doorman
     | Drifter
     | Dynamo
+    | Graves
     | Grey_Talon
     | Haze
     | Holliday
@@ -24,6 +25,7 @@ module T = struct
     | Paige
     | Paradox
     | Pocket
+    | Rem
     | Seven
     | Shiv
     | Sinclair
@@ -47,6 +49,7 @@ let of_csv = function
 | "Doorman" -> Doorman
 | "Drifter" -> Drifter
 | "Dynamo" -> Dynamo
+| "Graves" -> Graves
 | "Grey Talon" -> Grey_Talon
 | "Haze" -> Haze
 | "Holliday" -> Holliday
@@ -62,6 +65,7 @@ let of_csv = function
 | "Paige" -> Paige
 | "Paradox" -> Paradox
 | "Pocket" -> Pocket
+| "Rem" -> Rem
 | "Seven" -> Seven
 | "Shiv" -> Shiv
 | "Sinclair" -> Sinclair
@@ -82,6 +86,7 @@ let to_string = function
 | Doorman -> "Doorman"
 | Drifter -> "Drifter"
 | Dynamo -> "Dynamo"
+| Graves -> "Graves"
 | Grey_Talon -> "Grey Talon"
 | Haze -> "Haze"
 | Holliday -> "Holliday"
@@ -97,6 +102,7 @@ let to_string = function
 | Paige -> "Paige"
 | Paradox -> "Paradox"
 | Pocket -> "Pocket"
+| Rem -> "Rem"
 | Seven -> "Seven"
 | Shiv -> "Shiv"
 | Sinclair -> "Sinclair"
@@ -116,6 +122,7 @@ let is_frontliner = function
 | Doorman -> false
 | Drifter -> true
 | Dynamo -> false
+| Graves -> false
 | Grey_Talon -> false
 | Haze -> false
 | Holliday -> false
@@ -131,6 +138,7 @@ let is_frontliner = function
 | Paige -> false
 | Paradox -> false
 | Pocket -> false
+| Rem -> false
 | Seven -> false
 | Shiv -> true
 | Sinclair -> false
@@ -150,6 +158,7 @@ let is_carry = function
 | Doorman -> false
 | Drifter -> false
 | Dynamo -> false
+| Graves -> true
 | Grey_Talon -> false
 | Haze -> true
 | Holliday -> false
@@ -166,6 +175,7 @@ let is_carry = function
 | Paradox -> false
 | Pocket -> false
 | Seven -> true
+| Rem -> false
 | Shiv -> false
 | Sinclair -> false
 | Victor -> true
@@ -184,6 +194,7 @@ let is_pick = function
 | Doorman -> true
 | Drifter -> false
 | Dynamo -> true
+| Graves -> false
 | Grey_Talon -> false
 | Haze -> false
 | Holliday -> true
@@ -199,6 +210,7 @@ let is_pick = function
 | Paige -> false
 | Paradox -> true
 | Pocket -> false
+| Rem -> false
 | Seven -> false
 | Shiv -> false
 | Sinclair -> false
@@ -218,6 +230,7 @@ let is_teamfighter = function
 | Doorman -> false
 | Drifter -> false
 | Dynamo -> true
+| Graves -> false
 | Grey_Talon -> false
 | Haze -> false
 | Holliday -> false
@@ -233,6 +246,7 @@ let is_teamfighter = function
 | Paige -> false
 | Paradox -> false
 | Pocket -> true
+| Rem -> true
 | Seven -> true
 | Shiv -> false
 | Sinclair -> true
