@@ -28,7 +28,9 @@ module T = struct
     | Rem
     | Seven
     | Shiv
+    | Silver
     | Sinclair
+    | Venator
     | Victor
     | Vindicta
     | Viscous
@@ -68,7 +70,9 @@ let of_csv = function
 | "Rem" -> Rem
 | "Seven" -> Seven
 | "Shiv" -> Shiv
+| "Silver" -> Silver
 | "Sinclair" -> Sinclair
+| "Venator" -> Venator
 | "Victor" -> Victor
 | "Vindicta" -> Vindicta
 | "Viscous" -> Viscous
@@ -105,7 +109,9 @@ let to_string = function
 | Rem -> "Rem"
 | Seven -> "Seven"
 | Shiv -> "Shiv"
+| Silver -> "Silver"
 | Sinclair -> "Sinclair"
+| Venator -> "Venator"
 | Victor -> "Victor"
 | Vindicta -> "Vindicta"
 | Viscous -> "Viscous"
@@ -141,7 +147,9 @@ let is_frontliner = function
 | Rem -> false
 | Seven -> false
 | Shiv -> true
+| Silver -> true
 | Sinclair -> false
+| Venator -> true
 | Victor -> true
 | Vindicta -> false
 | Viscous -> true
@@ -177,7 +185,9 @@ let is_carry = function
 | Seven -> true
 | Rem -> false
 | Shiv -> false
+| Silver -> true
 | Sinclair -> false
+| Venator -> true
 | Victor -> true
 | Vindicta -> false
 | Viscous -> false
@@ -213,7 +223,9 @@ let is_pick = function
 | Rem -> false
 | Seven -> false
 | Shiv -> false
+| Silver -> false
 | Sinclair -> false
+| Venator -> false
 | Victor -> false
 | Vindicta -> false
 | Viscous -> false
@@ -249,7 +261,9 @@ let is_teamfighter = function
 | Rem -> true
 | Seven -> true
 | Shiv -> false
+| Silver -> false
 | Sinclair -> true
+| Venator -> false
 | Victor -> false
 | Vindicta -> false
 | Viscous -> true
