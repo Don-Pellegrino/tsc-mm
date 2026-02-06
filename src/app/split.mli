@@ -8,7 +8,7 @@ val create : Team.t -> Team.t -> t
 
 val players_together : t -> Player.t * Player.t -> bool
 
-val teams : t -> [ `Amber of Team.t ] * [ `Sapphire of Team.t ]
+val teams : t -> [ `HiddenKing of Team.t ] * [ `ArchMother of Team.t ]
 
 val imbalance : t -> int
 

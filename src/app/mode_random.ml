@@ -53,7 +53,7 @@ let run players priorities ~help_low_ranks ~handicap_high_ranks ~inspect splits 
   let split, Split.Random_heroes.{ hero_by_player; points; total_points; _ } =
     Map.nth_exn splits (Random.int num_splits) |> snd
   in
-  let `Amber amber, `Sapphire sapphire = Split.teams split in
+  let `HiddenKing hk, `ArchMother am = Split.teams split in
   let display (players : Player.t list) =
     List.map players ~f:(fun p -> sprintf !"- %s (%{Hero})" p.name (Map.find_exn hero_by_player p))
     |> String.concat ~sep:"\n"
@@ -61,13 +61,12 @@ let run players priorities ~help_low_ranks ~handicap_high_ranks ~inspect splits 
   print_endline
     (sprintf
        !"Points (%d): %{sexp: (string * int) list}\n\n\
-         :raised_hand: Amber Hand:\n\
+         :icon_hiddenking: Hidden King:\n\
          %s\n\n\
-         :gem: Sapphire Flame:\n\
+         :icon_archmother: Arch Mother:\n\
          %s\n\n\
-         :raised_hand: Amber Hand:\n\
+         :icon_hiddenking: Hidden King:\n\
          %{Team.Strength}\n\n\
-         :gem: Sapphire Flame:\n\
+         :icon_archmother: Arch Mother:\n\
          %{Team.Strength}\n"
-       total_points points (display amber.players) (display sapphire.players) amber.strength
-       sapphire.strength )
+       total_points points (display hk.players) (display am.players) hk.strength am.strength )

@@ -33,8 +33,8 @@ let teams ((t1 : Team.t), (t2 : Team.t)) =
     | 0, false, true -> true
     | x, _, _ -> failwithf "Unexpected team strength comparison: %d" x ()
   in
-  let amber, sapphire = if t1_has_first_pick then t1, t2 else t2, t1 in
-  `Amber amber, `Sapphire sapphire
+  let hk, am = if t1_has_first_pick then t1, t2 else t2, t1 in
+  `HiddenKing hk, `ArchMother am
 
 let imbalance ((t1 : Team.t), (t2 : Team.t)) = t1.total_strength - t2.total_strength |> Int.abs
 

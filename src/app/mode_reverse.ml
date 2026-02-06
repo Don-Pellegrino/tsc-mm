@@ -8,30 +8,30 @@ let run ~offset submode splits () =
   let split, imbalance = List.nth_exn splits offset in
   print_endline (sprintf !"Number of splits: %d\n%{sexp: Split.t}" (List.length splits) split);
 
-  let `Amber amber, `Sapphire sapphire = Split.teams split in
+  let `HiddenKing hk, `ArchMother am = Split.teams split in
 
-  let amber_player, sapphire_player =
+  let hk_player, am_player =
     match submode with
-    | Random -> Team.random_player_strength_weighted amber, Team.random_player_strength_weighted sapphire
-    | Position index -> Team.player_position amber index, Team.player_position sapphire index
+    | Random -> Team.random_player_strength_weighted hk, Team.random_player_strength_weighted am
+    | Position index -> Team.player_position hk index, Team.player_position am index
   in
 
   print_endline
     (sprintf
        !"Imbalance: %d\n\n\
-         :raised_hand: Amber Hand Leader: **%s** [FIRST PICK]\n\
-         :gem: Sapphire Flame Leader: **%s**\n\n\
-         :raised_hand: Amber Hand:\n\
+         :icon_hiddenking: Hidden King Leader: **%s** [FIRST PICK]\n\
+         :icon_archmother: Arch Mother Leader: **%s**\n\n\
+         :icon_hiddenking: Hidden King:\n\
          %s\n\
-         :gem: Sapphire Flame:\n\
+         :icon_archmother: Arch Mother:\n\
          %s\n\
-         :raised_hand: Amber Hand:\n\
+         :icon_hiddenking: Hidden King:\n\
          %{Team.Strength}\n\n\
-         :gem: Sapphire Flame:\n\
+         :icon_archmother: Arch Mother:\n\
          %{Team.Strength}\n\n\
          %{Team.Hero_players}"
-       imbalance amber_player.name sapphire_player.name
-       (Team.to_string amber ~shuffle_order:true ~player_to_string:(fun p -> p.name))
-       (Team.to_string sapphire ~shuffle_order:true ~player_to_string:(fun p -> p.name))
-       amber.strength sapphire.strength
-       Team.Hero_players.(combine [ of_team amber; of_team sapphire ]) )
+       imbalance hk_player.name am_player.name
+       (Team.to_string hk ~shuffle_order:true ~player_to_string:(fun p -> p.name))
+       (Team.to_string am ~shuffle_order:true ~player_to_string:(fun p -> p.name))
+       hk.strength am.strength
+       Team.Hero_players.(combine [ of_team hk; of_team am ]) )

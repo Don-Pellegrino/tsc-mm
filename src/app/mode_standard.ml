@@ -6,7 +6,7 @@ let run ~offset ~items splits () =
   let split, imbalance = List.nth_exn splits offset in
   print_endline (sprintf !"Number of splits: %d\n%{sexp: Split.t}" (List.length splits) split);
 
-  let `Amber amber, `Sapphire sapphire = Split.teams split in
+  let `HiddenKing hk, `ArchMother am = Split.teams split in
   let player_to_string =
     let shuffled_items =
       let all_except_funny =
@@ -35,25 +35,25 @@ let run ~offset ~items splits () =
   print_endline
     (sprintf
        !"Imbalance: %d\n\n\
-         :raised_hand: Amber Hand [FIRST PICK]: \n\
+         :icon_hiddenking: Hidden King [FIRST PICK]: \n\
          %s\n\
-         :gem: Sapphire Flame: \n\
+         :icon_archmother: Arch Mother: \n\
          %s\n\
-         :raised_hand: Amber Hand:\n\
+         :icon_hiddenking: Hidden King:\n\
          %{Team.Strength}\n\n\
-         :gem: Sapphire Flame:\n\
+         :icon_archmother: Arch Mother:\n\
          %{Team.Strength}\n\n\
-         Amber Hand (%d): \n\
+         Hidden King (%d): \n\
          %s\n\
          %{Team.Hero_players}\n\n\
-         Sapphire Flame (%d): \n\
+         Arch Mother (%d): \n\
          %s\n\
          %{Team.Hero_players}"
        imbalance
-       (Team.to_string amber ~shuffle_order:true ~player_to_string)
-       (Team.to_string sapphire ~shuffle_order:true ~player_to_string)
-       amber.strength sapphire.strength amber.total_strength
-       (Team.to_string amber ~shuffle_order:false ~player_to_string:Player.to_string)
-       (Team.Hero_players.of_team amber) sapphire.total_strength
-       (Team.to_string sapphire ~shuffle_order:false ~player_to_string:Player.to_string)
-       (Team.Hero_players.of_team sapphire) )
+       (Team.to_string hk ~shuffle_order:true ~player_to_string)
+       (Team.to_string am ~shuffle_order:true ~player_to_string)
+       hk.strength am.strength hk.total_strength
+       (Team.to_string hk ~shuffle_order:false ~player_to_string:Player.to_string)
+       (Team.Hero_players.of_team hk) am.total_strength
+       (Team.to_string am ~shuffle_order:false ~player_to_string:Player.to_string)
+       (Team.Hero_players.of_team am) )
