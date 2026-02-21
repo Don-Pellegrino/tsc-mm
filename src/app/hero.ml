@@ -3,9 +3,11 @@ open! Core
 module T = struct
   type t =
     | Abrams
+    | Apollo
     | Bebop
     | Billy
     | Calico
+    | Celeste
     | Doorman
     | Drifter
     | Dynamo
@@ -45,9 +47,11 @@ include T
 
 let of_csv = function
 | "Abrams" -> Abrams
+| "Apollo" -> Apollo
 | "Bebop" -> Bebop
 | "Billy" -> Billy
 | "Calico" -> Calico
+| "Celeste" -> Celeste
 | "Doorman" -> Doorman
 | "Drifter" -> Drifter
 | "Dynamo" -> Dynamo
@@ -84,9 +88,11 @@ let of_csv = function
 
 let to_string = function
 | Abrams -> "Abrams"
+| Apollo -> "Apollo"
 | Bebop -> "Bebop"
 | Billy -> "Billy"
 | Calico -> "Calico"
+| Celeste -> "Celeste"
 | Doorman -> "Doorman"
 | Drifter -> "Drifter"
 | Dynamo -> "Dynamo"
@@ -122,11 +128,13 @@ let to_string = function
 
 let is_frontliner = function
 | Abrams -> true
+| Apollo -> true
 | Billy -> true
 | Bebop -> true
 | Calico -> true
+| Celeste -> false
 | Doorman -> false
-| Drifter -> true
+| Drifter -> false
 | Dynamo -> false
 | Graves -> false
 | Grey_Talon -> false
@@ -152,7 +160,7 @@ let is_frontliner = function
 | Venator -> true
 | Victor -> true
 | Vindicta -> false
-| Viscous -> true
+| Viscous -> false
 | Vyper -> false
 | Warden -> true
 | Wraith -> false
@@ -160,9 +168,11 @@ let is_frontliner = function
 
 let is_carry = function
 | Abrams -> false
+| Apollo -> false
 | Billy -> true
 | Bebop -> false
 | Calico -> false
+| Celeste -> false
 | Doorman -> false
 | Drifter -> false
 | Dynamo -> false
@@ -191,22 +201,24 @@ let is_carry = function
 | Victor -> true
 | Vindicta -> false
 | Viscous -> false
-| Vyper -> true
+| Vyper -> false
 | Warden -> true
 | Wraith -> true
 | Yamato -> false
 
 let is_pick = function
 | Abrams -> false
+| Apollo -> false
 | Billy -> false
 | Bebop -> true
 | Calico -> false
+| Celeste -> false
 | Doorman -> true
 | Drifter -> false
-| Dynamo -> true
+| Dynamo -> false
 | Graves -> false
 | Grey_Talon -> false
-| Haze -> false
+| Haze -> true
 | Holliday -> true
 | Infernus -> false
 | Ivy -> false
@@ -236,9 +248,11 @@ let is_pick = function
 
 let is_teamfighter = function
 | Abrams -> false
+| Apollo -> false
 | Billy -> false
 | Bebop -> false
 | Calico -> false
+| Celeste -> true
 | Doorman -> false
 | Drifter -> false
 | Dynamo -> true
