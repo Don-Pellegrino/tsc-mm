@@ -8,6 +8,7 @@ module Strength : sig
     main_hero_pool_size_bonus: int;
     total_hero_pool_size_bonus: int;
     comms_bonus: int;
+    draft_bonus: int;
   }
   [@@deriving sexp, compare]
 

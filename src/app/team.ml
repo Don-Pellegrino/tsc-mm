@@ -8,6 +8,7 @@ module Strength = struct
     main_hero_pool_size_bonus: int;
     total_hero_pool_size_bonus: int;
     comms_bonus: int;
+    draft_bonus: int;
   }
   [@@deriving sexp, compare]
 
@@ -19,12 +20,14 @@ module Strength = struct
       main_hero_pool_size_bonus;
       total_hero_pool_size_bonus;
       comms_bonus;
+      draft_bonus;
     } =
     total_player_strength
     + top_player_bonus
     + main_hero_pool_size_bonus
     + total_hero_pool_size_bonus
     + comms_bonus
+    + draft_bonus
 
   let to_string
     ( {
@@ -34,6 +37,7 @@ module Strength = struct
         main_hero_pool_size_bonus;
         total_hero_pool_size_bonus;
         comms_bonus;
+        draft_bonus;
       } as strength ) =
     let total_player_rank, total_player_comms, total_player_pools =
       List.fold player_strengths ~init:(0, 0, 0) ~f:(fun (acc_ranks, acc_pools, acc_comms) ps ->
@@ -47,11 +51,13 @@ module Strength = struct
       \  - From comms: %d\n\
       \  - From hero pools: %d\n\
        - Top player bonus: %d\n\
+       - Drafter bonus: %d\n\n\
        - Bonus for mains hero pool size: %d\n\
        - Bonus for draft strength: %d\n\
        - Bonus for comms/playstyle: %d\n\
        TOTAL: **%d**" total_player_strength total_player_rank total_player_comms total_player_pools
-      top_player_bonus main_hero_pool_size_bonus total_hero_pool_size_bonus comms_bonus (total strength)
+      top_player_bonus draft_bonus main_hero_pool_size_bonus total_hero_pool_size_bonus comms_bonus
+      (total strength)
 end
 
 module T = struct
@@ -84,13 +90,9 @@ let create (players : Player.t list) =
   in
   let main_hero_pool_size = Set.length main_hero_pool in
   let total_hero_pool_size = Set.length total_hero_pool in
-  let comms_bonus =
-    List.map players ~f:(fun p -> p.comms)
-    |> Modifier.Comms.Set.union_list
-    |> Set.filter ~f:Modifier.Comms.need_one_on_team
-    |> Set.length
-    |> ( * ) 4
-  in
+  let comms = List.map players ~f:(fun p -> p.comms) |> Modifier.Comms.Set.union_list in
+  let comms_bonus = Set.filter comms ~f:Modifier.Comms.need_one_on_team |> Set.length |> ( * ) 4 in
+  let draft_bonus = Set.mem comms Modifier.Comms.Draft |> Bool.to_int |> ( * ) 10 in
   let strength =
     Strength.
       {
@@ -100,6 +102,7 @@ let create (players : Player.t list) =
         main_hero_pool_size_bonus = Float.(of_int main_hero_pool_size * 1.5 |> to_int);
         total_hero_pool_size_bonus = Float.(of_int total_hero_pool_size * 0.75 |> to_int);
         comms_bonus;
+        draft_bonus;
       }
   in
   let total_strength = Strength.total strength in

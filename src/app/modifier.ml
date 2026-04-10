@@ -57,32 +57,35 @@ end
 module Comms = struct
   module T = struct
     type t =
+      | Draft
       | Macro
       | Picks
       | Alone
       | Ult
-      | Comms
+      | Morale
       | Quiet
       | Roam
       | Items
     [@@deriving sexp, compare, hash]
 
     let is_positive = function
+    | Draft -> true
     | Macro -> true
     | Picks -> true
     | Alone -> false
     | Ult -> true
-    | Comms -> true
+    | Morale -> true
     | Quiet -> false
     | Roam -> true
     | Items -> true
 
     let need_one_on_team = function
+    | Draft -> true
     | Macro -> true
     | Picks -> true
     | Alone -> false
     | Ult -> false
-    | Comms -> true
+    | Morale -> true
     | Quiet -> false
     | Roam -> true
     | Items -> true
@@ -97,11 +100,13 @@ module Comms = struct
   end
 
   let of_csv = function
+  | "I know how to draft a team comp: hero synergies, strong lane duos, weak lane duos, etc." -> Draft
   | "I tell my team when it's time to run urn, push walkers, farm, take midboss, etc." -> Macro
-  | "I often help generate a lot of ganks and picks for my team" -> Picks
+  | "I initiate many ganks and picks for my team" -> Picks
   | "I get caught and die alone at least 2-3 times per game" -> Alone
   | "When I have a big team ult I use it as much as possible, even on single targets sometimes" -> Ult
-  | "I use my microphone more than most people, I keep the team's spirits up!" -> Comms
+  | "I'm basically the team mascot, I'm the one encouraging the team when things are looking dire" ->
+    Morale
   | "I don't use my microphone much during a match" -> Quiet
   | "I often spend more time on the enemy's side of the map than mine" -> Roam
   | "I always buy at least 1-2 items that utterly cripple specific enemy heroes (ex. Slowing Hex against \
@@ -114,11 +119,12 @@ module Comms = struct
       CSet.fold comms ~init:(1.0, 0) ~f:(fun (acc_multiplier, acc_flat) comm ->
         let multiplier, flat =
           match comm with
+          | Draft -> 1.04, 5
           | Macro -> 1.04, 2
           | Picks -> 1.04, 3
           | Alone -> 0.94, -5
           | Ult -> 1.06, 0
-          | Comms -> 1.06, 2
+          | Morale -> 1.06, 2
           | Quiet -> 0.98, -5
           | Roam -> 1.06, 0
           | Items -> 1.06, 0

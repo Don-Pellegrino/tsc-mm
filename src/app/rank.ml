@@ -27,8 +27,8 @@ let strength = function
 | Oracle -> 102
 | Phantom_low -> 118
 | Phantom_high -> 134
-| Ascendant_low -> 157
-| Ascendant_high -> 190
+| Ascendant_low -> 159
+| Ascendant_high -> 188
 | Eternus -> 230
 
 let apply_multiplier rank multiplier =
