@@ -2,9 +2,10 @@ open! Core
 
 let funny_items = Items.T4.[| Magic_Carpet; Cheat_Death |]
 
-let run ~offset ~items splits () =
+let run ~debug ~offset ~items splits () =
   let split, imbalance = List.nth_exn splits offset in
-  print_endline (sprintf !"Number of splits: %d\n%{sexp: Split.t}" (List.length splits) split);
+  if debug
+  then print_endline (sprintf !"Number of splits: %d\n%{sexp: Split.t}" (List.length splits) split);
 
   let `HiddenKing hk, `ArchMother am = Split.teams split in
   let player_to_string =
@@ -34,26 +35,33 @@ let run ~offset ~items splits () =
   in
   print_endline
     (sprintf
-       !"Imbalance: %d\n\n\
+       !"Offset: %d\n\
+         Imbalance: %d\n\n\
+         === Post to channel ===\n\
          :icon_hiddenking: Hidden King [FIRST PICK]: \n\
          %s\n\
          :icon_archmother: Arch Mother: \n\
          %s\n\
+         === Validate for large differences in source of strength ===\n\
          :icon_hiddenking: Hidden King:\n\
          %{Team.Strength}\n\n\
          :icon_archmother: Arch Mother:\n\
          %{Team.Strength}\n\n\
+         === Select team leaders ===\n\
          Hidden King (%d): \n\
          %s\n\
-         %{Team.Hero_players}\n\n\
          Arch Mother (%d): \n\
-         %s\n\
+         %s\n\n\
+         === Paste into spreadsheet ===\n\
+         [Hidden King]\n\
+         %{Team.Hero_players}\n\n\
+         [Arch Mother]\n\
          %{Team.Hero_players}"
-       imbalance
+       offset imbalance
        (Team.to_string hk ~shuffle_order:true ~player_to_string)
        (Team.to_string am ~shuffle_order:true ~player_to_string)
        hk.strength am.strength hk.total_strength
        (Team.to_string hk ~shuffle_order:false ~player_to_string:Player.to_string)
-       (Team.Hero_players.of_team hk) am.total_strength
+       am.total_strength
        (Team.to_string am ~shuffle_order:false ~player_to_string:Player.to_string)
-       (Team.Hero_players.of_team am) )
+       (Team.Hero_players.of_team hk) (Team.Hero_players.of_team am) )

@@ -22,14 +22,14 @@ let strength = function
 | Alchemist -> 45
 | Arcanist -> 54
 | Ritualist -> 64
-| Emissary -> 75
-| Archon -> 87
-| Oracle -> 100
-| Phantom_low -> 107
-| Phantom_high -> 117
-| Ascendant_low -> 128
-| Ascendant_high -> 140
-| Eternus -> 170
+| Emissary -> 76
+| Archon -> 88
+| Oracle -> 102
+| Phantom_low -> 118
+| Phantom_high -> 134
+| Ascendant_low -> 157
+| Ascendant_high -> 190
+| Eternus -> 230
 
 let apply_multiplier rank multiplier =
   Float.(of_int (strength rank) * (multiplier - 1.0)) |> Float.round_nearest_half_to_even |> Float.to_int

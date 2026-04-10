@@ -59,13 +59,33 @@ module Comms = struct
     type t =
       | Macro
       | Picks
-      | Help
-      | Cooldowns
-      | Items
-      | Timers
+      | Alone
+      | Ult
       | Comms
       | Quiet
+      | Roam
+      | Items
     [@@deriving sexp, compare, hash]
+
+    let is_positive = function
+    | Macro -> true
+    | Picks -> true
+    | Alone -> false
+    | Ult -> true
+    | Comms -> true
+    | Quiet -> false
+    | Roam -> true
+    | Items -> true
+
+    let need_one_on_team = function
+    | Macro -> true
+    | Picks -> true
+    | Alone -> false
+    | Ult -> false
+    | Comms -> true
+    | Quiet -> false
+    | Roam -> true
+    | Items -> true
   end
 
   include T
@@ -77,24 +97,33 @@ module Comms = struct
   end
 
   let of_csv = function
-  | "I discuss/make important macro calls for my team" -> Macro
-  | "I call out potential ganks and picks" -> Picks
-  | "I call for help when needed" -> Help
-  | "I keep my team aware of my important cooldowns" -> Cooldowns
-  | "I keep my team informed of the enemy's important items" -> Items
-  | "I keep track of timers (buffs, midboss) for my team" -> Timers
-  | "My comms are so good they sometimes win games" -> Comms
+  | "I tell my team when it's time to run urn, push walkers, farm, take midboss, etc." -> Macro
+  | "I often help generate a lot of ganks and picks for my team" -> Picks
+  | "I get caught and die alone at least 2-3 times per game" -> Alone
+  | "When I have a big team ult I use it as much as possible, even on single targets sometimes" -> Ult
+  | "I use my microphone more than most people, I keep the team's spirits up!" -> Comms
   | "I don't use my microphone much during a match" -> Quiet
+  | "I often spend more time on the enemy's side of the map than mine" -> Roam
+  | "I always buy at least 1-2 items that utterly cripple specific enemy heroes (ex. Slowing Hex against \
+     Calico, Crippling Headshots against Victor)" ->
+    Items
   | s -> failwithf "Invalid Comms modifier: %S" s ()
 
   let strength rank comms =
-    let comms, quiet =
-      CSet.partition_tf comms ~f:(function
-        | Quiet -> false
-        | _ -> true )
-      |> Tuple2.map_snd ~f:(fun x -> CSet.is_empty x |> not)
+    let multiplier, flat =
+      CSet.fold comms ~init:(1.0, 0) ~f:(fun (acc_multiplier, acc_flat) comm ->
+        let multiplier, flat =
+          match comm with
+          | Macro -> 1.04, 2
+          | Picks -> 1.04, 3
+          | Alone -> 0.94, -5
+          | Ult -> 1.06, 0
+          | Comms -> 1.06, 2
+          | Quiet -> 0.98, -5
+          | Roam -> 1.06, 0
+          | Items -> 1.06, 0
+        in
+        Float.(acc_multiplier + (multiplier - 1.0)), acc_flat + flat )
     in
-    let len = CSet.length comms |> Float.of_int |> Float.( * ) 0.01 in
-    let multiplier = len |> Float.( * ) (if quiet then 0.5 else 2.0) |> Float.( + ) 1.0 in
-    Rank.apply_multiplier rank multiplier
+    flat + Rank.apply_multiplier rank multiplier
 end

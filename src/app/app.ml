@@ -43,6 +43,10 @@ let () =
   let open Command in
   let open Command.Let_syntax in
   let splits = make_splits () in
+  let debug =
+    Param.(
+      flag "-d" no_arg ~aliases:[ "--debug" ] ~full_flag_required:() ~doc:"Print debugging information" )
+  in
   let offset =
     let%map offset =
       Param.(
@@ -52,16 +56,18 @@ let () =
     if offset < 0 then failwithf "Offset must be >0 but it was %d" offset () else offset
   in
   let standard =
-    let%map offset = offset
+    let%map debug = debug
+    and offset = offset
     and items =
       Param.(
         flag "-i" no_arg ~aliases:[ "--items" ] ~full_flag_required:()
           ~doc:"Pick a random T4 item for each player" )
     in
-    Mode_standard.run ~offset ~items splits
+    Mode_standard.run ~debug ~offset ~items splits
   in
   let reverse =
-    let%map offset = offset
+    let%map debug = debug
+    and offset = offset
     and submode =
       Param.(
         flag "-p" (optional int) ~aliases:[ "--position" ] ~full_flag_required:()
@@ -71,12 +77,13 @@ let () =
       | None -> Mode_reverse.Random
       | Some index -> Position index
     in
-    Mode_reverse.run ~offset submode splits
+    Mode_reverse.run ~debug ~offset submode splits
   in
   let random =
     let random (priorities : Split.Random_heroes.priorities) =
       let random =
-        let%map no_help_low_ranks =
+        let%map debug = debug
+        and no_help_low_ranks =
           Param.(
             flag "-nl" no_arg ~aliases:[ "--no-help-low-ranks" ] ~full_flag_required:()
               ~doc:"Do not give Ritualist and below a more familiar hero" )
@@ -91,7 +98,7 @@ let () =
         in
         let help_low_ranks = not no_help_low_ranks in
         let handicap_high_ranks = not no_handicap_high_ranks in
-        Mode_random.run players priorities ~help_low_ranks ~handicap_high_ranks ~inspect splits
+        Mode_random.run players priorities ~debug ~help_low_ranks ~handicap_high_ranks ~inspect splits
       in
       let summary =
         sprintf

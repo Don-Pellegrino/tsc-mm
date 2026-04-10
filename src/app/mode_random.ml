@@ -8,8 +8,8 @@ module Dedupe = Map.Make (struct
   type t = Split.player_assignments [@@deriving sexp, compare]
 end)
 
-let run players priorities ~help_low_ranks ~handicap_high_ranks ~inspect splits () =
-  print_endline (sprintf !"%{sexp: Player.t list}" players);
+let run players priorities ~debug ~help_low_ranks ~handicap_high_ranks ~inspect splits () =
+  if debug then print_endline (sprintf !"%{sexp: Player.t list}" players);
   let acceptable_splits =
     List.filter_map splits ~f:(fun (split, imbalance) ->
       Option.some_if (imbalance <= max_imbalance) split )

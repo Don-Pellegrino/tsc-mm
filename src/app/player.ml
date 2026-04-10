@@ -48,7 +48,7 @@ let create ~name rank difficulty success comms main_hero_pool secondary_hero_poo
         main_hero_pool =
           min 3 (Set.length main_hero_pool)
           |> Float.of_int
-          |> Float.( * ) 0.02
+          |> Float.( * ) 0.03
           |> Float.( + ) 1.0
           |> Rank.apply_multiplier rank;
         secondary_hero_pool =

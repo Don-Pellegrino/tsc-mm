@@ -2,11 +2,12 @@ open! Core
 
 module Strength = struct
   type t = {
-    player_strengths: Player.Strength.t list;
+    player_strengths: Player.Strength.t list; [@sexp.ignore]
     total_player_strength: int;
     top_player_bonus: int;
     main_hero_pool_size_bonus: int;
     total_hero_pool_size_bonus: int;
+    comms_bonus: int;
   }
   [@@deriving sexp, compare]
 
@@ -17,8 +18,13 @@ module Strength = struct
       top_player_bonus;
       main_hero_pool_size_bonus;
       total_hero_pool_size_bonus;
+      comms_bonus;
     } =
-    total_player_strength + top_player_bonus + main_hero_pool_size_bonus + total_hero_pool_size_bonus
+    total_player_strength
+    + top_player_bonus
+    + main_hero_pool_size_bonus
+    + total_hero_pool_size_bonus
+    + comms_bonus
 
   let to_string
     ( {
@@ -27,20 +33,25 @@ module Strength = struct
         top_player_bonus;
         main_hero_pool_size_bonus;
         total_hero_pool_size_bonus;
+        comms_bonus;
       } as strength ) =
-    let total_player_comms, total_player_pools =
-      List.fold player_strengths ~init:(0, 0) ~f:(fun (acc_comms, acc_pools) ps ->
-        acc_comms + ps.comms, acc_pools + ps.main_hero_pool + ps.secondary_hero_pool )
+    let total_player_rank, total_player_comms, total_player_pools =
+      List.fold player_strengths ~init:(0, 0, 0) ~f:(fun (acc_ranks, acc_pools, acc_comms) ps ->
+        ( acc_ranks + (ps.rank + ps.difficulty_success),
+          acc_comms + ps.comms,
+          acc_pools + ps.main_hero_pool + ps.secondary_hero_pool ) )
     in
     sprintf
       "- Total player strength: %d\n\
+      \  - From ranks: %d\n\
       \  - From comms: %d\n\
       \  - From hero pools: %d\n\
        - Top player bonus: %d\n\
        - Bonus for mains hero pool size: %d\n\
        - Bonus for draft strength: %d\n\
-       TOTAL: **%d**" total_player_strength total_player_comms total_player_pools top_player_bonus
-      main_hero_pool_size_bonus total_hero_pool_size_bonus (total strength)
+       - Bonus for comms/playstyle: %d\n\
+       TOTAL: **%d**" total_player_strength total_player_rank total_player_comms total_player_pools
+      top_player_bonus main_hero_pool_size_bonus total_hero_pool_size_bonus comms_bonus (total strength)
 end
 
 module T = struct
@@ -66,13 +77,20 @@ let create (players : Player.t list) =
     List.fold_map players ~init:(0, 0) ~f:(fun (acc_max, acc_sum) { total_strength = x; strength; _ } ->
       (max acc_max x, acc_sum + x), strength )
   in
-  let main_hero_pool, total_hero_pool =
-    List.fold players ~init:(Hero.Set.empty, Hero.Set.empty) ~f:(fun (acc_main, acc_total) p ->
-      ( Set.union acc_main p.main_hero_pool,
-        Hero.Set.union_list [ acc_total; p.main_hero_pool; p.secondary_hero_pool ] ) )
+  let main_hero_pool = List.map players ~f:(fun p -> p.main_hero_pool) |> Hero.Set.union_list in
+  let total_hero_pool =
+    List.concat_map players ~f:(fun p -> [ p.main_hero_pool; p.secondary_hero_pool ])
+    |> Hero.Set.union_list
   in
   let main_hero_pool_size = Set.length main_hero_pool in
   let total_hero_pool_size = Set.length total_hero_pool in
+  let comms_bonus =
+    List.map players ~f:(fun p -> p.comms)
+    |> Modifier.Comms.Set.union_list
+    |> Set.filter ~f:Modifier.Comms.need_one_on_team
+    |> Set.length
+    |> ( * ) 4
+  in
   let strength =
     Strength.
       {
@@ -80,7 +98,8 @@ let create (players : Player.t list) =
         total_player_strength;
         top_player_bonus = top_player_strength / 2;
         main_hero_pool_size_bonus = Float.(of_int main_hero_pool_size * 1.5 |> to_int);
-        total_hero_pool_size_bonus = total_hero_pool_size;
+        total_hero_pool_size_bonus = Float.(of_int total_hero_pool_size * 0.75 |> to_int);
+        comms_bonus;
       }
   in
   let total_strength = Strength.total strength in

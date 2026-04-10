@@ -4,9 +4,10 @@ type submode =
   | Random
   | Position of int
 
-let run ~offset submode splits () =
+let run ~debug ~offset submode splits () =
   let split, imbalance = List.nth_exn splits offset in
-  print_endline (sprintf !"Number of splits: %d\n%{sexp: Split.t}" (List.length splits) split);
+  if debug
+  then print_endline (sprintf !"Number of splits: %d\n%{sexp: Split.t}" (List.length splits) split);
 
   let `HiddenKing hk, `ArchMother am = Split.teams split in
 
