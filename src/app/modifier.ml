@@ -1,57 +1,39 @@
 open! Core
 
-module Difficulty = struct
-  type t =
-    | Higher
-    | Same
-    | Lower
-    | Dont_know
-  [@@deriving sexp, hash]
+module Ranking_up_down = struct
+  module T = struct
+    type t =
+      | Up_slowly
+      | Up_quickly
+      | Staying_same
+      | Down_slowly
+      | Down_quickly
+      | Not_playing_much
+    [@@deriving sexp, compare, hash]
+  end
+
+  include T
 
   let of_csv = function
-  | "A lot of my matches are of a HIGHER rank than my own" -> Higher
-  | "They tend to be of the same rank" -> Same
-  | "A lot of my matches are of a LOWER rank than my own" -> Lower
-  | "I don't know and I can't even try to guess" -> Dont_know
-  | s -> failwithf "Invalid Difficulty modifier: %S" s ()
-end
+  | "I've been slowly ranking up :)" -> Up_slowly
+  | "I've been ranking up fairly quickly :D" -> Up_quickly
+  | "I've been staying roughly the same" -> Staying_same
+  | "I've been slowly ranking down :(" -> Down_slowly
+  | "I've been ranking down fairly quickly D:" -> Down_quickly
+  | "I don't know and I can't even try to guess because I haven't been playing much" -> Not_playing_much
+  | s -> failwithf "Invalid Ranking_up_down modifier: %S" s ()
 
-module Success = struct
-  type t =
-    | Winning
-    | Half
-    | Lose
-    | Not_enough
-  [@@deriving sexp, hash]
-
-  let of_csv = function
-  | "I've had more wins than losses lately (:" -> Winning
-  | "About 50/50" -> Half
-  | "I've had more losses than wins lately ):" -> Lose
-  | "I basically haven't been playing Deadlock in the last few weeks" -> Not_enough
-  | s -> failwithf "Invalid Success modifier: %S" s ()
-end
-
-module Difficulty_Success = struct
-  let strength rank (difficulty : Difficulty.t) (success : Success.t) =
-    let multiplier, flat =
-      match difficulty, success with
-      | Higher, Winning -> 1.1, 4
-      | Higher, Half -> 1.1, 0
-      | Higher, (Lose | Not_enough) -> 1.0, -2
-      | Same, Winning -> 1.05, 1
-      | Same, Half -> 1.0, 0
-      | Same, Lose -> 0.95, -1
-      | Same, Not_enough -> 0.9, 0
-      | Lower, Winning -> 1.0, -2
-      | Lower, Half -> 1.0, -1
-      | Lower, Lose -> 0.9, -2
-      | Lower, Not_enough -> 0.8, 0
-      | Dont_know, Winning -> 1.0, 1
-      | Dont_know, Half -> 0.95, 0
-      | Dont_know, (Lose | Not_enough) -> 0.90, 0
+  let strength rank (ranking_up_down : t) =
+    let multiplier =
+      match ranking_up_down with
+      | Up_slowly -> 1.1
+      | Up_quickly -> 0.95 (* slow it down *)
+      | Staying_same -> 1.0
+      | Down_slowly -> 0.90
+      | Down_quickly -> 1.05 (* slow it down *)
+      | Not_playing_much -> 0.85
     in
-    flat + Rank.apply_multiplier rank multiplier
+    Rank.apply_multiplier rank multiplier
 end
 
 module Comms = struct
@@ -119,17 +101,18 @@ module Comms = struct
       CSet.fold comms ~init:(1.0, 0) ~f:(fun (acc_multiplier, acc_flat) comm ->
         let multiplier, flat =
           match comm with
-          | Draft -> 1.04, 5
-          | Macro -> 1.04, 2
-          | Picks -> 1.04, 3
+          | Draft -> 1.02, 5
+          | Macro -> 1.02, 5
+          | Picks -> 1.02, 4
           | Alone -> 0.94, -5
-          | Ult -> 1.06, 0
-          | Morale -> 1.06, 2
-          | Quiet -> 0.98, -5
-          | Roam -> 1.06, 0
-          | Items -> 1.06, 0
+          | Ult -> 1.02, 0
+          | Morale -> 1.03, 2
+          | Quiet -> 0.96, -2
+          | Roam -> 1.03, 0
+          | Items -> 1.02, 5
         in
         Float.(acc_multiplier + (multiplier - 1.0)), acc_flat + flat )
     in
-    flat + Rank.apply_multiplier rank multiplier
+    let bonus = flat + Rank.apply_multiplier rank multiplier in
+    min bonus Float.(Rank.strength rank // 5 |> to_int)
 end

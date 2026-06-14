@@ -7,7 +7,11 @@ let all_players =
   |> Array.fold ~init:String.Map.empty ~f:(fun acc player ->
        Map.add_exn acc ~key:player.name ~data:player )
 
-let players = Import.Players.of_filename "players.csv" |> List.map ~f:(Map.find_exn all_players)
+let players =
+  Import.Players.of_filename "players.csv"
+  |> List.filter_map ~f:(function
+       | name when String.is_prefix name ~prefix:"#" -> None
+       | name -> Some (Map.find_exn all_players name) )
 
 let enforce_pairings = [||] |> Array.map ~f:(Tuple2.map ~f:(Map.find_exn all_players))
 

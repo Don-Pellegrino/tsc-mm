@@ -41,9 +41,9 @@ module Strength = struct
       } as strength ) =
     let total_player_rank, total_player_comms, total_player_pools =
       List.fold player_strengths ~init:(0, 0, 0) ~f:(fun (acc_ranks, acc_pools, acc_comms) ps ->
-        ( acc_ranks + (ps.rank + ps.difficulty_success),
+        ( acc_ranks + (ps.rank + ps.ranking_up_down),
           acc_comms + ps.comms,
-          acc_pools + ps.main_hero_pool + ps.secondary_hero_pool ) )
+          acc_pools + ps.main_hero_pool + ps.total_hero_pool ) )
     in
     sprintf
       "- Total player strength: %d\n\
@@ -98,7 +98,7 @@ let create (players : Player.t list) =
       {
         player_strengths;
         total_player_strength;
-        top_player_bonus = top_player_strength / 2;
+        top_player_bonus = Float.(of_int top_player_strength / 1.5 |> to_int);
         main_hero_pool_size_bonus = Float.(of_int main_hero_pool_size * 1.5 |> to_int);
         total_hero_pool_size_bonus = Float.(of_int total_hero_pool_size * 0.75 |> to_int);
         comms_bonus;
