@@ -6,7 +6,7 @@ module Strength : sig
     main_hero_pool: int;
     total_hero_pool: int;
     ranking_up_down: int;
-    support_main: int;
+    low_agency: int;
     comms: int;
   }
   [@@deriving sexp, compare]

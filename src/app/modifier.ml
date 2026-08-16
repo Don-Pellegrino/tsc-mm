@@ -26,12 +26,12 @@ module Ranking_up_down = struct
   let strength rank (ranking_up_down : t) =
     let multiplier =
       match ranking_up_down with
-      | Up_slowly -> 1.1
+      | Up_slowly -> 1.08
       | Up_quickly -> 0.95 (* slow it down *)
       | Staying_same -> 1.0
-      | Down_slowly -> 0.90
+      | Down_slowly -> 0.92
       | Down_quickly -> 1.05 (* slow it down *)
-      | Not_playing_much -> 0.85
+      | Not_playing_much -> 0.86
     in
     Rank.apply_multiplier rank multiplier
 end

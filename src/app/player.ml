@@ -6,13 +6,13 @@ module Strength = struct
     main_hero_pool: int;
     total_hero_pool: int;
     ranking_up_down: int;
-    support_main: int;
+    low_agency: int;
     comms: int;
   }
   [@@deriving sexp, compare]
 
-  let total_strength { rank; main_hero_pool; total_hero_pool; ranking_up_down; support_main; comms } =
-    rank + main_hero_pool + total_hero_pool + ranking_up_down + support_main + comms
+  let total_strength { rank; main_hero_pool; total_hero_pool; ranking_up_down; low_agency; comms } =
+    rank + main_hero_pool + total_hero_pool + ranking_up_down + low_agency + comms
 end
 
 module T = struct
@@ -42,7 +42,7 @@ let create ~name rank ranking_up_down comms main_hero_pool secondary_hero_pool =
   let total_hero_pool = Set.union main_hero_pool secondary_hero_pool in
   let unselected_hero_pool = Set.diff Hero.all_set total_hero_pool in
   let comms = Modifier.Comms.Set.of_list comms in
-  let is_support_main = Set.for_all main_hero_pool ~f:Hero.is_support in
+  let is_low_agency = Set.for_all main_hero_pool ~f:Hero.is_low_agency in
   let strength =
     Strength.
       {
@@ -60,7 +60,7 @@ let create ~name rank ranking_up_down comms main_hero_pool secondary_hero_pool =
           |> Float.( + ) 1.0
           |> Rank.apply_multiplier rank;
         ranking_up_down = Modifier.Ranking_up_down.strength rank ranking_up_down;
-        support_main = (if is_support_main then Rank.apply_multiplier rank 0.92 else 0);
+        low_agency = (if is_low_agency then Rank.apply_multiplier rank 0.92 else 0);
         comms = Modifier.Comms.strength rank comms;
       }
   in

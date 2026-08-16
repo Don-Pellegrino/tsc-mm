@@ -28,7 +28,7 @@ let strength = function
 | Phantom_low -> 116
 | Phantom_high -> 132
 | Ascendant_low -> 152
-| Ascendant_high -> 178
+| Ascendant_high -> 188
 | Eternus -> 240
 
 let apply_multiplier rank multiplier =
