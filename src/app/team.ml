@@ -41,7 +41,7 @@ module Strength = struct
       } as strength ) =
     let total_player_rank, total_player_comms, total_player_pools =
       List.fold player_strengths ~init:(0, 0, 0) ~f:(fun (acc_ranks, acc_pools, acc_comms) ps ->
-        ( acc_ranks + (ps.rank + ps.ranking_up_down),
+        ( acc_ranks + (ps.rank + ps.practice),
           acc_comms + ps.comms,
           acc_pools + ps.main_hero_pool + ps.total_hero_pool ) )
     in

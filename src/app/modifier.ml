@@ -1,37 +1,37 @@
 open! Core
 
-module Ranking_up_down = struct
+module Practice = struct
   module T = struct
     type t =
-      | Up_slowly
-      | Up_quickly
-      | Staying_same
-      | Down_slowly
-      | Down_quickly
-      | Not_playing_much
+      | Live_and_breathe
+      | More
+      | Same
+      | Less
+      | Back_from_break
+      | On_a_break
     [@@deriving sexp, compare, hash]
   end
 
   include T
 
   let of_csv = function
-  | "I've been slowly ranking up :)" -> Up_slowly
-  | "I've been ranking up fairly quickly :D" -> Up_quickly
-  | "I've been staying roughly the same" -> Staying_same
-  | "I've been slowly ranking down :(" -> Down_slowly
-  | "I've been ranking down fairly quickly D:" -> Down_quickly
-  | "I don't know and I can't even try to guess because I haven't been playing much" -> Not_playing_much
-  | s -> failwithf "Invalid Ranking_up_down modifier: %S" s ()
+  | "I live and breathe Deadlock right now" -> Live_and_breathe
+  | "More than usual" -> More
+  | "About the same as usual" -> Same
+  | "Less than usual" -> Less
+  | "I'm just coming back from a break" -> Back_from_break
+  | "I'm mostly taking a break right now" -> On_a_break
+  | s -> failwithf "Invalid Practice modifier: %S" s ()
 
-  let strength rank (ranking_up_down : t) =
+  let strength rank (practice : t) =
     let multiplier =
-      match ranking_up_down with
-      | Up_slowly -> 1.08
-      | Up_quickly -> 0.95 (* slow it down *)
-      | Staying_same -> 1.0
-      | Down_slowly -> 0.92
-      | Down_quickly -> 1.05 (* slow it down *)
-      | Not_playing_much -> 0.86
+      match practice with
+      | Live_and_breathe -> 1.06
+      | More -> 1.03
+      | Same -> 1.0
+      | Less -> 0.96
+      | Back_from_break -> 0.90
+      | On_a_break -> 0.86
     in
     Rank.apply_multiplier rank multiplier
 end

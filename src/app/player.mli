@@ -5,7 +5,7 @@ module Strength : sig
     rank: int;
     main_hero_pool: int;
     total_hero_pool: int;
-    ranking_up_down: int;
+    practice: int;
     low_agency: int;
     comms: int;
   }
@@ -17,7 +17,7 @@ end
 type t = private {
   name: string;
   rank: Rank.t;
-  ranking_up_down: Modifier.Ranking_up_down.t;
+  practice: Modifier.Practice.t;
   comms: Modifier.Comms.Set.t;
   main_hero_pool: Hero.Set.t;
   secondary_hero_pool: Hero.Set.t;
@@ -29,8 +29,8 @@ type t = private {
 
 val create :
   name:string ->
-  Rank.t ->
-  Modifier.Ranking_up_down.t ->
+  rank:Rank.t ->
+  Modifier.Practice.t ->
   Modifier.Comms.t list ->
   Hero.t list ->
   Hero.t list ->
@@ -38,11 +38,11 @@ val create :
 
 val of_csv :
   name:string ->
-  rank:string ->
-  ranking_up_down:string ->
+  practice:string ->
   comms:string ->
   main_hero_pool:string ->
   secondary_hero_pool:string ->
+  rank:Rank.t ->
   t
 
 val to_string : t -> string

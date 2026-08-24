@@ -5,21 +5,21 @@ module Strength = struct
     rank: int;
     main_hero_pool: int;
     total_hero_pool: int;
-    ranking_up_down: int;
+    practice: int;
     low_agency: int;
     comms: int;
   }
   [@@deriving sexp, compare]
 
-  let total_strength { rank; main_hero_pool; total_hero_pool; ranking_up_down; low_agency; comms } =
-    rank + main_hero_pool + total_hero_pool + ranking_up_down + low_agency + comms
+  let total_strength { rank; main_hero_pool; total_hero_pool; practice; low_agency; comms } =
+    rank + main_hero_pool + total_hero_pool + practice + low_agency + comms
 end
 
 module T = struct
   type t = {
     name: string;
     rank: Rank.t;
-    ranking_up_down: Modifier.Ranking_up_down.t;
+    practice: Modifier.Practice.t;
     comms: Modifier.Comms.Set.t;
     main_hero_pool: Hero.Set.t;
     secondary_hero_pool: Hero.Set.t;
@@ -36,7 +36,7 @@ end
 
 include T
 
-let create ~name rank ranking_up_down comms main_hero_pool secondary_hero_pool =
+let create ~name ~rank practice comms main_hero_pool secondary_hero_pool =
   let main_hero_pool = Hero.Set.of_list main_hero_pool in
   let secondary_hero_pool = Set.diff (Hero.Set.of_list secondary_hero_pool) main_hero_pool in
   let total_hero_pool = Set.union main_hero_pool secondary_hero_pool in
@@ -59,7 +59,7 @@ let create ~name rank ranking_up_down comms main_hero_pool secondary_hero_pool =
           |> Float.( * ) 0.008
           |> Float.( + ) 1.0
           |> Rank.apply_multiplier rank;
-        ranking_up_down = Modifier.Ranking_up_down.strength rank ranking_up_down;
+        practice = Modifier.Practice.strength rank practice;
         low_agency = (if is_low_agency then Rank.apply_multiplier rank 0.92 else 0);
         comms = Modifier.Comms.strength rank comms;
       }
@@ -68,7 +68,7 @@ let create ~name rank ranking_up_down comms main_hero_pool secondary_hero_pool =
   {
     name;
     rank;
-    ranking_up_down;
+    practice;
     comms;
     main_hero_pool;
     secondary_hero_pool;
@@ -102,13 +102,12 @@ let parse_list parser = function
   in
   if Buffer.length buf > 0 then (Buffer.contents buf |> parser) :: parsed else parsed
 
-let of_csv ~name ~rank ~ranking_up_down ~comms ~main_hero_pool ~secondary_hero_pool =
-  let rank = Rank.of_csv rank in
-  let ranking_up_down = Modifier.Ranking_up_down.of_csv ranking_up_down in
+let of_csv ~name ~practice ~comms ~main_hero_pool ~secondary_hero_pool =
+  let practice = Modifier.Practice.of_csv practice in
   let comms = parse_list Modifier.Comms.of_csv comms in
   let main_hero_pool = parse_list Hero.of_csv main_hero_pool in
   let secondary_hero_pool = parse_list Hero.of_csv secondary_hero_pool in
-  create ~name rank ranking_up_down comms main_hero_pool secondary_hero_pool
+  create ~name practice comms main_hero_pool secondary_hero_pool
 
 let to_string p = sprintf !"%s (%{sexp: Rank.t}, %d)" p.name p.rank p.total_strength
 

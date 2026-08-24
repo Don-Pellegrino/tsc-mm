@@ -4,16 +4,17 @@ let () = Random.self_init ()
 
 let all_players =
   Import.Form.of_filename "tsc.csv"
-  |> Array.fold ~init:String.Map.empty ~f:(fun acc player ->
-       Map.add_exn acc ~key:player.name ~data:player )
+  |> Array.fold ~init:String.Map.empty ~f:(fun acc (name, player) ->
+       Map.add_exn acc ~key:name ~data:player )
 
 let players =
   Import.Players.of_filename "players.csv"
-  |> List.filter_map ~f:(function
-       | name when String.is_prefix name ~prefix:"#" -> None
-       | name -> Some (Map.find_exn all_players name) )
+  |> List.map ~f:(fun (rank, name) -> (Map.find_exn all_players name) ~rank)
 
-let enforce_pairings = [||] |> Array.map ~f:(Tuple2.map ~f:(Map.find_exn all_players))
+let enforce_pairings =
+  [||]
+  |> Array.map
+       ~f:(Tuple2.map ~f:(fun name -> List.find_exn players ~f:(fun p -> String.( = ) p.name name)))
 
 let () =
   let len = List.length players in
